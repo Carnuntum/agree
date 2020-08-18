@@ -1,0 +1,125 @@
+
+
+.btn {
+	transition-duration: 0.4s;
+	border: none;
+}
+
+.btn:hover {
+	background-color: grey;
+	color: white;
+}
+
+
+h3 {color:black;}
+
+.chiRow1 {height:300px;}
+
+/*give a fluidrow a custom class like 'class = something' to refer to elements
+in just that row*/
+.chiValueBox1 .small-box {height: 115px;}
+.chiValueBox2 .small-box {height: 115px;}
+.contCoeffValueBox .small-box {height: 115px;}
+
+/*.style_valuebox_PA .small-box {height: 115px;}*/
+/*.style_valuebox_PA1 .box.box {
+  background: #309CCC;
+}*/
+
+
+
+.style_valuebox_PA_cyan .small-box {
+  background-color: #309CCC !important;
+  box-shadow: none;
+}
+
+.style_valuebox_SPEAR_cyan .small-box {
+  background-color: #309CCC !important;
+  box-shadow: none;
+}
+
+/*.tab1 .tab-content {
+  background-color: #404040;
+}
+
+.tab1 .nav > li[class=active] > a {
+  background-color: #404040;
+  color: white;
+}
+
+.tab1 .nav {
+  background-color: #404040;
+  color: white;
+  border: none;
+}
+
+.tab1 .nav > li[class=active] > a[data-value='tab1'] {
+  background-color: #404040;
+  color: white;
+  border: none;
+}
+
+.tab1 .nav > li[class=active] > a[data-value='tab2'] {
+  background-color: #404040;
+  color: white;
+  border: none;
+}
+
+.tab1 .nav > li > a:hover {
+  background-color: dimgrey;
+  color: white;
+  border: none;
+}
+
+.tab1 .nav > li > a {
+  color: white;
+}*/
+
+
+
+
+
+/*.btn .testbtn {
+  padding-left: -20px;
+}*/
+
+
+.kappaValueBox1 .small-box {height: 115px;}
+.kappaValueBox2 .small-box {height: 115px;}
+.kappaValueBox3 .small-box {height: 115px;}
+/*only .small-box would also work to change the color*/
+
+/*.small-box.bg-aqua {
+  background-color: #309CCC !important;
+}*/
+/*.table {background-color: white;}
+
+
+/*file fileInput is below
+/*.shiny-input-container {color: red;}
+/*
+changes all valueboxes, not really wanted
+.small-box {
+  font-size: 30px;
+  height: 115px;
+}*/
+
+.btn-settBtn {
+  font-size: 15px;
+  margin-top: 10px;
+  margin-right: 25px;
+  border: none;
+}
+
+.column {
+  padding: -50px;
+}
+/*.info-box-icon {background-color: red !important;}*/
+
+/*change sidebar menu tabs border width and color*/
+.skin-blue .sidebar-menu > .active > a {
+  border-left: 0;
+}
+.skin-blue .sidebar-menu > li > a {
+  border-left: 0;
+}
