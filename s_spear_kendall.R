@@ -1,6 +1,6 @@
 source('src_functions.R')
 
-spearmanRank <- tabItem(tabName = 'spear',
+ordinalRank <- tabItem(tabName = 'spear',
                         fluidRow(
                           column(
                             width = 10,
