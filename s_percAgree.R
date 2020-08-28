@@ -85,21 +85,21 @@ percentAgree <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_PA',
+           fluidRow(class = 'style_valuebox_PA_cyan',
                     column(
                       width = 12,
                       valueBoxOutput(outputId = 'paTotal',
                                      width = NULL)
                     )
            ),
-           fluidRow(class = 'style_valuebox_PA',
+           fluidRow(class = 'style_valuebox_PA_cyan',
                     column(
                       width = 12,
                       valueBoxOutput(outputId = 'paExpected',
                                      width = NULL)
                     )
            ),
-           fluidRow(class = 'style_valuebox_PA',
+           fluidRow(class = 'style_valuebox_PA_cyan',
                     column(
                       width = 12,
                       valueBoxOutput(outputId = 'paUncategorized',
@@ -227,19 +227,19 @@ percAgrPN <- tabItem(tabName = 'percAgrPN',
 #-------------------------------------------------------------------------------
 #'*--------------- PERCENT AGREEMENT EXAMPLE TABLE DATA -----------------------*
 #-------------------------------------------------------------------------------
-paExampleTable <- function(input, output) {
-  output$expPA <- function() {
-    kable(percAgrTableExp, format = 'html') %>%
-      kable_styling(bootstrap_options = 'basic')
-  }
-}
-
-paExampleTablePN <- function(input, output) {
-  output$expPN <- function() {
-    kable(percAgrPosNeg, format = 'html') %>%
-      kable_styling(bootstrap_options = 'basic')
-  }
-}
+# paExampleTable <- function(input, output) {
+#   output$expPA <- function() {
+#     kable(percAgrTableExp, format = 'html') %>%
+#       kable_styling(bootstrap_options = 'basic')
+#   }
+# }
+# 
+# paExampleTablePN <- function(input, output) {
+#   output$expPN <- function() {
+#     kable(percAgrPosNeg, format = 'html') %>%
+#       kable_styling(bootstrap_options = 'basic')
+#   }
+# }
 
 #-------------------------------------------------------------------------------
 #'*---------------- DEFAULT INFORMATION FOR PA OUTPUT BOXES -------------------*

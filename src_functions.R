@@ -1,3 +1,36 @@
+#-------------------------------------------------------------------------------
+#'*----------------------- DATA EXAMPLE TABLES --------------------------------*
+#-------------------------------------------------------------------------------
+ExampleTables <- function(input, output) {
+  
+  output$expChi <- function() {
+    kable(chiTableExp, format = 'html') %>%
+      kable_styling('basic')
+  }
+  
+  output$expPA <- function() {
+    kable(percAgrTableExp, format = 'html') %>%
+      kable_styling(bootstrap_options = 'basic')
+  }
+  
+  output$expPN <- function() {
+    kable(percAgrPosNeg, format = 'html') %>%
+      kable_styling(bootstrap_options = 'basic')
+  }
+  
+  output$expKappa <- function() {
+    kable(kappaTableExample, format = 'html') %>%
+      kable_styling('basic')
+  }
+  
+  output$expSpear <- function() {
+    kable(spearmanTableExample, format = 'html') %>%
+      kable_styling('basic')
+  }
+}
+
+
+
 PercentAgreeFor2by2 <- function(userData) {
   
   userData <- as.matrix(userData)
@@ -173,17 +206,133 @@ odds <- function(data, alpha = 0.05) {
               'transformedOddsUB' = transfQHigh))
 }
 
+
+#-------------------------------------------------------------------------------
+#'*---------------------------- HELPER FUNCTIONS ------------------------------*
+#-------------------------------------------------------------------------------
+# help_check_ties <- function(data) {
+#   return(
+#     any(sapply(data, function(x, y) {
+#       x <- data[,1]
+#       y <- data[,2]
+#       x == y
+#       }))
+#     )
+# }
+help_check_ties <- function(data) {
+  return(any(sapply(data, duplicated)))
+}
+
+
+help_tauInt_sort <- function(data) {
+  out <- data.frame()
+  k <- na.omit(data)
+  
+  
+  for(i in 1:nrow(k)) {
+    m <- min(k)
+    w <- which(k == m, arr.ind = T)
+    
+    out <- rbind(out, k[w[,1][1], ])
+    k <- k[-w[,1][1], ]
+  }
+  return(out)
+}
+
+#-------------------------------------------------------------------------------
+#'*------------------------ HELPER FUNCTIONS END ------------------------------*
+#-------------------------------------------------------------------------------
+
+intraclassTau <- function(data) {
+  nn <- help_tauInt_sort(data)
+  nn <- pivot_longer(nn,
+                     cols = 1:2,
+                     names_to = 'new',
+                     values_to = 'nums')
+  
+  idx <- 1
+  nums <- nn$nums[3:length(nn$nums)]
+  
+  above <- 0 
+  below <- 0
+  for(i in 1:((length(nums)/2))) {
+    
+    above <- above + sum(sapply(nn$nums[idx], `<`, nums))
+    below <- below + sum(sapply(nn$nums[idx], `>`, nums))
+    idx <- idx + 1
+    above <- above + sum(sapply(nn$nums[idx], `<`, nums))
+    below <- below + sum(sapply(nn$nums[idx], `>`, nums))
+    
+    nums <- nums[-(1:2)]
+    
+    idx <- idx + 1
+  }
+  
+  S <- above-below
+  N <- nrow(data) * ncol(data)
+  
+  Sp <- S - ((N * (N - 2)) / 4)
+  
+  sig <- sqrt((N * (N - 2) * (N + 2)) / 18)
+  
+  u <- (abs(Sp) - 1) / sig
+  
+  tauIn <- Sp / (N * (N - 2) / 4)
+  
+  tryCatch({
+    p <- if(Sp <= 90 & N <= 20) {
+      if(Sp %% 2 == 0) {
+        if(is.na(p_table[which(p_table$Sp == Sp), paste0("X", N)])) {
+          NULL
+        } else {
+          as.numeric(p_table[which(p_table$Sp == Sp), paste0("X", N)])
+        }
+      } else {
+        NULL
+      }
+      
+    }
+  }, error = function(e) {
+    print(paste('following error occured: ', e))
+  })
+  
+            
+  
+  return (list('S' = S, 'N' = N,
+               'Sp' = Sp, 'sigma' = sig,
+               'u' = u, 'tauIn' = tauIn,
+               'p.value' = p))
+}
+
+
+
+
+
 ordinals <- function(data, method) {
   
   tryCatch ({
     if(method == 'spearman') {
       cor.test(data[,1], data[,2], method = method)
     }
-    else if(method == 'kendall') {
-      kendall(data)
+    else if(method == 'kendW') {
+      if(help_check_ties(data)) {
+        kendall(data, correct = T)
+      } else {
+        kendall(data)
+      }
+    }
+    else if (method == 'tauB') {
+      cor.test(data[,1], data[,2], method = 'kendall')
+    }
+    else if (method == 'tauC') {
+      DescTools::StuartTauC(data[,1], data[,2], conf.level = 0.95)
+    }
+    else if (method == 'tauIntra') {
+      intraclassTau(data)
     }
   },
   error = function(e) {
     print(e)
   })
 }
+

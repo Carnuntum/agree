@@ -8,6 +8,15 @@ server <- function(input, output, session) {
   }
   #-------------------------------------------------------------------------------
   
+  
+  lapply(list('imp_text', 'imp_text2', 'imp_text3'), onclick,
+         toggle(id = 'test', anim = T))
+  
+  observe({
+    req(input$ordinalInput)
+    session$sendCustomMessage("upload_msg", "valid file")
+  })
+  
   #-----------------------------------------------------------------------------
   #'*-------------------------- NAVIGATION LOGIC ------------------------------*
   #-----------------------------------------------------------------------------
@@ -19,15 +28,16 @@ server <- function(input, output, session) {
   })
   
   
+  ExampleTables(input, output)
   #-----------------------------------------------------------------------------
   #'*--------------------- SERVER LOGIC FOR CHI INPUT -------------------------*
   #-----------------------------------------------------------------------------
-  chiExampleTable(input, output) #function for chi table example data to be 
+  #chiExampleTable(input, output) #function for chi table example data to be 
                                  #displayed
   
   
   chiData <- reactive({ #save browsed user input for data
-    read_csv(input$chiInput$datapath)
+    read.csv(input$chiInput$datapath)
   })
   
   #run button for chi calculation for example table data
@@ -45,8 +55,8 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   #'*------------------------ PERCENT AGREEMENT -------------------------------*
   #-----------------------------------------------------------------------------
-  paExampleTable(input, output) #function for example data in s_percAgree.R
-  paExampleTablePN(input, output)
+  #paExampleTable(input, output) #function for example data in s_percAgree.R
+  #paExampleTablePN(input, output)
   paOutDefault(input, output) #default output for valueboxes
   
   paData <- eval(paData, envir = environment())
@@ -90,10 +100,10 @@ server <- function(input, output, session) {
   #'*------------------------------- KAPPA ------------------------------------*
   #-----------------------------------------------------------------------------
   kappaOutDefault(input, output)
-  kappaExampleTable(input, output)
+  #kappaExampleTable(input, output)
   
   kappaData <- reactive({ #user input data
-    read_csv(input$kappaInput$datapath)
+    read.csv(input$kappaInput$datapath)
   })
   
   observeEvent(input$kappaTest, kappaOut(input, output, kappaTableExample))
@@ -112,39 +122,66 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   #'*--------------------------- SPEARMAN RHO ---------------------------------*
   #-----------------------------------------------------------------------------
-  spearExp(input, output)
+  #spearExp(input, output)
   spearOutDefault(input, output)
   
   ordinalData <- reactive({ #user input data
     read.csv(input$ordinalInput$datapath)
   })
   
-  observeEvent(input$spearTest, spearOut(input, output, spearmanTableExample,
+  observeEvent(input$spearTest, ordinalRankOut(input, output, spearmanTableExample,
                                          'spearman'))
   
   observeEvent(input$spear_p_value, spear_no_exact_p())
   
-  spear_react_btn <- eventReactive(input$spearRun,
-                                {T})
+  # spear_react_btn <- eventReactive(input$spearRank,
+  #                               {T})
+  # 
+  # kendallW_react_btn <- eventReactive(input$kendRank,
+  #                                    {T})
   
-  kendallW_react_btn <- eventReactive(input$kendRun,
-                                     {T})
-  
-  observeEvent(spear_react_btn(),
+  observeEvent(input$spearRank,
                {
                  if (is.null(input$ordinalInput)) {
                    btnPressWithoutData()
                  } else {
-                   spearOut(input, output, ordinalData(), 'spearman')
+                   ordinalRankOut(input, output, ordinalData(), 'spearman')
                  }
                })
   
-  observeEvent(kendallW_react_btn(),
+  observeEvent(input$kendW,
                {
                  if (is.null(input$ordinalInput)) {
                    btnPressWithoutData()
                  } else {
-                   spearOut(input, output, ordinalData(), 'kendall')
+                   ordinalRankOut(input, output, ordinalData(), 'kendW')
+                 }
+               })
+  
+  observeEvent(input$tauB,
+               {
+                 if(is.null((input$ordinalInput))) {
+                   btnPressWithoutData()
+                 } else {
+                   ordinalRankOut(input, output, ordinalData(), 'tauB')
+                 }
+               })
+  
+  observeEvent(input$tauC,
+               {
+                 if(is.null((input$ordinalInput))) {
+                   btnPressWithoutData()
+                 } else {
+                   ordinalRankOut(input, output, ordinalData(), 'tauC')
+                 }
+               })
+  
+  observeEvent(input$tauInt,
+               {
+                 if(is.null((input$ordinalInput))) {
+                   btnPressWithoutData()
+                 } else {
+                   ordinalRankOut(input, output, ordinalData(), 'tauIntra')
                  }
                })
   

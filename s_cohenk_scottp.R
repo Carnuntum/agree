@@ -40,21 +40,21 @@ cohenk <- tabItem(useShinyjs(),tabName = 'cohenk',
               style = 'float:right;'))),
       column(
         width = 5,
-        fluidRow(class = 'kappaValueBox1',
+        fluidRow(class = 'style_valuebox_PA_cyan',
                  column(
                    width = 12,
                    style = 'text-align: center;',
                    valueBoxOutput(
                      outputId = 'kappa1',
                      width = NULL))),
-        fluidRow(class = 'kappaValueBox2',
+        fluidRow(class = 'style_valuebox_PA_cyan',
                  column(
                    width = 12, 
                    style = 'text-align: center;',
                    valueBoxOutput(
                      outputId = 'pi1',
                      width = NULL))),
-        fluidRow(class = 'kappaValueBox3',
+        fluidRow(class = 'style_valuebox_PA_cyan',
                  column(
                    width = 12, 
                    style = 'text-align: center;',
@@ -75,12 +75,12 @@ cohenk <- tabItem(useShinyjs(),tabName = 'cohenk',
 #-------------------------------------------------------------------------------
 #'*-------------------- KAPPA EXAMPLE TABLE DATA ------------------------------*
 #-------------------------------------------------------------------------------
-kappaExampleTable <- function(inp, out) {
-  output$expKappa <- function() {
-    kable(kappaTableExample, format = 'html') %>%
-      kable_styling('basic')
-  }
-}
+# kappaExampleTable <- function(inp, out) {
+#   output$expKappa <- function() {
+#     kable(kappaTableExample, format = 'html') %>%
+#       kable_styling('basic')
+#   }
+# }
 
 
 

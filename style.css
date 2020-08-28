@@ -17,9 +17,9 @@ h3 {color:black;}
 
 /*give a fluidrow a custom class like 'class = something' to refer to elements
 in just that row*/
-.chiValueBox1 .small-box {height: 115px;}
+/*.chiValueBox1 .small-box {height: 115px;}
 .chiValueBox2 .small-box {height: 115px;}
-.contCoeffValueBox .small-box {height: 115px;}
+.contCoeffValueBox .small-box {height: 115px;}*/
 
 /*.style_valuebox_PA .small-box {height: 115px;}*/
 /*.style_valuebox_PA1 .box.box {
@@ -29,12 +29,17 @@ in just that row*/
 
 
 .style_valuebox_PA_cyan .small-box {
-  background-color: #309CCC !important;
+  background-color: #3c8dbc !important;
   box-shadow: none;
 }
 
 .style_valuebox_SPEAR_cyan .small-box {
-  background-color: #309CCC !important;
+  background-color: #3c8dbc !important;
+  box-shadow: none;
+}
+
+.style_valuebox_OrdRank_cyan .small-box {
+  background-color: #3c8dbc !important;
   box-shadow: none;
 }
 
@@ -84,9 +89,9 @@ in just that row*/
 }*/
 
 
-.kappaValueBox1 .small-box {height: 115px;}
+/*.kappaValueBox1 .small-box {height: 115px;}
 .kappaValueBox2 .small-box {height: 115px;}
-.kappaValueBox3 .small-box {height: 115px;}
+.kappaValueBox3 .small-box {height: 115px;}*/
 /*only .small-box would also work to change the color*/
 
 /*.small-box.bg-aqua {
@@ -122,4 +127,34 @@ changes all valueboxes, not really wanted
 }
 .skin-blue .sidebar-menu > li > a {
   border-left: 0;
+}
+
+.progress-bar {
+  color: black;
+  background-color: #3c8dbc;
+}
+
+.btn-file {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  border-right-width: 2px;
+  border-right-color: black;
+}
+
+.chiFileInput .btn-file {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.documRow {
+  padding-top: 30px;
+}
+
+.homeDocumBtns .action-button.shiny-bound-input {
+  margin-right: 20px;
+}
+
+.ordBttns .btn {
+  margin-right: 5px;
+  margin-top: 5px;
 }

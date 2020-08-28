@@ -7,7 +7,7 @@ chi <- tabItem(useShinyjs(), tabName = 'chi',
                  style = 'text-align: center; padding: 30px;',
                  h3('Chi-square Test for 2 Dimensional Contingency Tables')
                ),
-               fluidRow(
+               fluidRow(class = 'chiFileInput',
                  column(
                    width = 5, 
                    offset = 1,
@@ -38,21 +38,21 @@ chi <- tabItem(useShinyjs(), tabName = 'chi',
                          style = 'float:right;'))),
                  column(
                    width = 5,
-                   fluidRow(class = 'chiValueBox1',
+                   fluidRow(class = 'style_valuebox_OrdRank_cyan',
                             column(
                               width = 12,
                               style = 'text-align: center;',
                               valueBoxOutput(
                                 outputId = 'chiCor',
                                 width = NULL))),
-                   fluidRow(class = 'chiValueBox2',
+                   fluidRow(class = 'style_valuebox_OrdRank_cyan',
                             column(
                               width = 12, 
                               style = 'text-align: center;',
                               valueBoxOutput(
                                 outputId = 'chiUncor',
                                 width = NULL))),
-                   fluidRow(class = 'contCoeffValueBox',
+                   fluidRow(class = 'style_valuebox_OrdRank_cyan',
                             column(
                               width = 12,
                               style = 'text-align: center;',
@@ -72,12 +72,12 @@ chi <- tabItem(useShinyjs(), tabName = 'chi',
 #-------------------------------------------------------------------------------
 #'*-------------------- CHI EXAMPLE TABLE DATA --------------------------------*
 #-------------------------------------------------------------------------------
-chiExampleTable <- function(input, output) {
-  output$expChi <- function() {
-    kable(chiTableExp, format = 'html') %>%
-      kable_styling('basic')
-  }
-}
+# chiExampleTable <- function(input, output) {
+#   output$expChi <- function() {
+#     kable(chiTableExp, format = 'html') %>%
+#       kable_styling('basic')
+#   }
+# }
 
 #-------------------------------------------------------------------------------
 #'*---------------- DEFAULT INFORMATION FOR CHI OUTPUT BOXES ------------------*

@@ -1,9 +1,10 @@
 
 docMenu <- menuItem('Documentation', tabName = 'docum', 
-                          icon = icon('angle-rigt'))
+                          icon = icon('info-circle'))
 
 allMethods <- menuItem(text = 'Methods', 
                        tabName = 'methods',
+                       icon = icon('chart-bar'),
                        
                        menuItem(text = 'Nominal Scale Data',
                                 tabName = 'nominal',
@@ -24,6 +25,6 @@ allMethods <- menuItem(text = 'Methods',
                        menuItem(text = 'Ordinal Scale Data',
                                 tabName = 'ordinal',
                                 startExpanded = T,
-                          menuItem(text = "Spearman's Rho",
-                                   tabName = 'spear',
+                          menuItem(text = "Rank Measures",
+                                   tabName = 'ordRank',
                                    selected = T)))

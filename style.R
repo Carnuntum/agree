@@ -1,7 +1,7 @@
 
 navbarCol <- tags$style(HTML(
   '.skin-blue .main-header .navbar {transition:1s}
-     .skin-blue .main-header .navbar:hover {background-color: dimgrey}'
+   .skin-blue .main-header .navbar:hover {background-color: dimgrey}'
 ))
 bodyCol <- tags$style(HTML(
   '.content-wrapper {background-color: dimwhite;}'))
@@ -14,7 +14,7 @@ boxCol <- tags$style(HTML(
       border-right-color:white;
       border-top-color:white;
       background:white
-      }'))
+    }'))
 
 tabCol <- tags$style(HTML(
   ".tab1 .tab-content {
@@ -134,3 +134,10 @@ btn_hover <- function(input, output) {
     }
   })
 }
+
+js_upload_complete <- "
+Shiny.addCustomMessageHandler('upload_msg', function(msg) {
+  var target = $('#ordinalInput_progress').children()[0];
+  target.innerHTML = msg;
+});
+"

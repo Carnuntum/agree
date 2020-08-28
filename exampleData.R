@@ -30,3 +30,14 @@ kappaTableExample <- matrix(data = c(c(2,2,3,3,4,6,8,1,5,7),
 
 spearmanTableExample <- data.frame('rater1' = c(1,7,6,5,5,2,9),
                                    'rater2' = c(3,9,6,6,7,4,8))
+
+kendTauWOutTies <- data.frame('rater1' = c(1,2,3,4,5),
+                             'rater2' = c(2,1,4,5,3))
+
+kendTauWithTies <- data.frame('rater1' = c(1,2,2,4,4,6,6,8,9,9),
+                              'rater2' = c(1,2,4,4,4,4,8,8,8,10))
+
+kendTauC <- data.frame('rater1' = c(15,2,16,7,4,13,6,8),
+                       'rater2' = c(12,1,10,11,3,14,5,9))
+
+p_table <- read.csv2('example_data/tauIntra_p_table.csv')
