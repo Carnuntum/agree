@@ -88,23 +88,23 @@ cohenk <- tabItem(useShinyjs(),tabName = 'cohenk',
 #-------------------------------------------------------------------------------
 #'*-------------- DEFAULT INFORMATION FOR KAPPA OUTPUT BOXES ------------------*
 #-------------------------------------------------------------------------------
-kappaOutDefault <- function(inp, out) {
-  output$kappa1 <- renderValueBox({
-    if (is.null(input$kappaInput)) {
-      valueBox(value = h5(''), subtitle = "Cohen's Kappa")
-    }
-  })
-  output$pi1 <- renderValueBox({
-    if (is.null(input$kappaInput)) {
-      valueBox(value = h5(''), "Scott's Pi")
-    }
-  })
-  output$fleissKappa <- renderValueBox({
-    if (is.null(input$kappaInput)) {
-      valueBox(value = h5(''), "Fleiss' Kappa")
-    }
-  })
-}
+# kappaOutDefault <- function(inp, out) {
+#   output$kappa1 <- renderValueBox({
+#     if (is.null(input$kappaInput)) {
+#       valueBox(value = h5(''), subtitle = "Cohen's Kappa")
+#     }
+#   })
+#   output$pi1 <- renderValueBox({
+#     if (is.null(input$kappaInput)) {
+#       valueBox(value = h5(''), "Scott's Pi")
+#     }
+#   })
+#   output$fleissKappa <- renderValueBox({
+#     if (is.null(input$kappaInput)) {
+#       valueBox(value = h5(''), "Fleiss' Kappa")
+#     }
+#   })
+# }
 
 #-------------------------------------------------------------------------------
 #'*------------------ CALCULATED OUTPUT FOR CHI TEST --------------------------*

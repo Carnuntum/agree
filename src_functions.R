@@ -27,9 +27,130 @@ ExampleTables <- function(input, output) {
     kable(spearmanTableExample, format = 'html') %>%
       kable_styling('basic')
   }
+  
+  output$expPolyc1 <- function() {
+    kable(polycXmp, format = 'html') %>%
+      kable_styling('basic')
+  }
+  
+  output$expPolyc2 <- function() {
+    kable(polycXmp2, format = 'html') %>%
+      kable_styling('basic')
+  }
+}
+
+#-------------------------------------------------------------------------------
+#'*------------------------- DEFAULT OUTPUT FOR ALL ---------------------------*
+#-------------------------------------------------------------------------------
+
+defaultOutAll <- function(input, output) {
+  
+
+#'*--------------------------------- CHI --------------------------------------*
+#-------------------------------------------------------------------------------
+
+  output$chiUncor <- renderValueBox({
+    if (is.null(input$chiInput)) {
+      valueBox(value = h5('Statistic uncorrected'), '')
+    }
+  })
+  output$chiCor <- renderValueBox({
+    if (is.null(input$chiInput)) {
+      valueBox(value = h5('Statistic corrected'), '')
+    }
+  })
+  output$contingencyCoeff <- renderValueBox({
+    if (is.null(input$chiInput)) {
+      valueBox(value = h5('Contingency Coefficient C'), '')
+    }
+  })
+
+  
+#'*-------------------------- PERCENT AGREEMENT -------------------------------*
+#-------------------------------------------------------------------------------
+  output$paTotal <- renderValueBox({
+    valueBox(value = h4('Total Percent Agreement',
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
+  })
+  output$paExpected <- renderValueBox({
+    valueBox(value = h4('Expected Percent Agreement',
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
+  })
+  output$paUncategorized <- renderValueBox({
+    valueBox(value = h4('Percent Agreement With Uncategorizations',
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
+  })
+  output$pn <- renderValueBox({
+    valueBox(value = h4('Positive/Negative Percent Agreement',
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
+  })
+  output$pnCond <- renderValueBox({
+    valueBox(value = h4('Conditional Positive/Negative PA',
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
+  })
+  output$kappa_pa <- renderValueBox({
+    valueBox(value = h4('Category Specific Kappa Coefficient',
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
+  })
+  output$x2_pa <- renderValueBox({
+    valueBox(value = h4('Chi Square Test for Significance',
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
+  })
+  output$mcnemar_pa <- renderValueBox({
+    valueBox(value = h4('McNemar Test For Difference In Marginal Distribution',
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
+  })
+  
+#'*---------------------------------- KAPPA -----------------------------------*
+#-------------------------------------------------------------------------------
+  output$kappa1 <- renderValueBox({
+    if (is.null(input$kappaInput)) {
+      valueBox(value = h5(''), subtitle = "Cohen's Kappa")
+    }
+  })
+  output$pi1 <- renderValueBox({
+    if (is.null(input$kappaInput)) {
+      valueBox(value = h5(''), "Scott's Pi")
+    }
+  })
+  output$fleissKappa <- renderValueBox({
+    if (is.null(input$kappaInput)) {
+      valueBox(value = h5(''), "Fleiss' Kappa")
+    }
+  })
+  
+#'*------------------------------- ORDINAL RANK -------------------------------*
+#-------------------------------------------------------------------------------
+  output$ord1 <- renderValueBox({
+    valueBox(value = h4("Output",
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
+  })
+  
+#'*------------------------------- ORDINAL RANK -------------------------------*
+#-------------------------------------------------------------------------------
+  output$polyc1 <- renderValueBox({
+    valueBox(value = h4("Output",
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
+  })
+  
 }
 
 
+
+
+#-------------------------------------------------------------------------------
+#'*--------------------- DEFAULT OUTPUT FOR ALL END ---------------------------*
+#-------------------------------------------------------------------------------
 
 PercentAgreeFor2by2 <- function(userData) {
   
@@ -321,6 +442,8 @@ ordinals <- function(data, method) {
         kendall(data)
       }
     }
+    #tau A and B are the same B is used in the cor.test function because its
+    #already the function which corrects for ties
     else if (method == 'tauB') {
       cor.test(data[,1], data[,2], method = 'kendall')
     }
@@ -335,4 +458,18 @@ ordinals <- function(data, method) {
     print(e)
   })
 }
+
+
+polyc <- function(data) {
+  tryCatch({
+    return(list('values' = psych::polychoric(data),
+                'warn' = names(last.warning)
+                )
+           )
+  }, error = function(e) {
+    print(e)
+  })
+
+}
+
 

@@ -82,24 +82,24 @@ chi <- tabItem(useShinyjs(), tabName = 'chi',
 #-------------------------------------------------------------------------------
 #'*---------------- DEFAULT INFORMATION FOR CHI OUTPUT BOXES ------------------*
 #-------------------------------------------------------------------------------
-chiOutDefault <- function(inp, out) {
-  output$chiUncor <- renderValueBox({
-    if (is.null(input$chiInput)) {
-      valueBox(value = h5('Statistic uncorrected'), '')
-    }
-  })
-  output$chiCor <- renderValueBox({
-    if (is.null(input$chiInput)) {
-      valueBox(value = h5('Statistic corrected'), '')
-    }
-  })
-  
-  output$contingencyCoeff <- renderValueBox({
-    if (is.null(input$chiInput)) {
-      valueBox(value = h5('Contingency Coefficient C'), '')
-    }
-  })
-}
+# chiOutDefault <- function(inp, out) {
+#   output$chiUncor <- renderValueBox({
+#     if (is.null(input$chiInput)) {
+#       valueBox(value = h5('Statistic uncorrected'), '')
+#     }
+#   })
+#   output$chiCor <- renderValueBox({
+#     if (is.null(input$chiInput)) {
+#       valueBox(value = h5('Statistic corrected'), '')
+#     }
+#   })
+#   
+#   output$contingencyCoeff <- renderValueBox({
+#     if (is.null(input$chiInput)) {
+#       valueBox(value = h5('Contingency Coefficient C'), '')
+#     }
+#   })
+# }
 
 
 

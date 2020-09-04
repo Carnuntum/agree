@@ -43,6 +43,15 @@ in just that row*/
   box-shadow: none;
 }
 
+.style_valuebox_POLYC_cyan .small-box {
+  background-color: #3c8dbc !important;
+  box-shadow: none;
+}
+
+.style_valuebox_POLYC_cyan tr:hover {
+  background-color: #51BFFF !important;
+}
+
 /*.tab1 .tab-content {
   background-color: #404040;
 }
@@ -157,4 +166,9 @@ changes all valueboxes, not really wanted
 .ordBttns .btn {
   margin-right: 5px;
   margin-top: 5px;
+}
+
+
+.modaldiag h4 {
+  color: black;
 }

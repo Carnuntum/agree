@@ -41,3 +41,9 @@ kendTauC <- data.frame('rater1' = c(15,2,16,7,4,13,6,8),
                        'rater2' = c(12,1,10,11,3,14,5,9))
 
 p_table <- read.csv2('example_data/tauIntra_p_table.csv')
+
+polycXmp <- as.table(matrix(c(23,45,23,67,45,78,45,12,78), 3, 3))
+
+polycXmp2 <- round(data.frame('rater1' = rnorm(7, 3, 1),
+                              'rater2' = rnorm(7,3, 1),
+                              'rater3' = rnorm(7, 3, 1)))

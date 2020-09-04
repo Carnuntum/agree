@@ -97,15 +97,7 @@ ordinalRank <- tabItem(tabName = 'ordRank',
 #'*------------------------- DEFAULT OUTPUT -----------------------------------*
 #-------------------------------------------------------------------------------
 
-spearOutDefault <- function(inp, out) {
-  output$ord1 <- renderValueBox({
-    
-    valueBox(value = h4("Output",
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-    
-  })
-}
+#see src_functions section default out for all
 
 #-------------------------------------------------------------------------------
 #'*------------------------- CALCULATED OUTPUT --------------------------------*
@@ -226,13 +218,3 @@ ordinalRankOut <- function(input, output, data, method) {
 }
 
 
-spear_no_exact_p <- function() {
-  showModal(
-    modalDialog(
-      title = 'Warning!',
-      'Exact p-value cannot be calculated with ties in dataset!',
-      easyClose = T,
-      style = 'text-align: center;'
-    )
-  )
-}

@@ -1,7 +1,6 @@
 source('text.R')
 
 documentation <- tabItem(tabName = 'docum',
-                         useShinyjs(),
                          fluidRow(
                            column(
                              width = 10,

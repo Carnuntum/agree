@@ -17,42 +17,43 @@ boxCol <- tags$style(HTML(
     }'))
 
 tabCol <- tags$style(HTML(
-  ".tab1 .tab-content {
+  ".tabStyle .tab-content {
       background-color: white;
+      color: black
     }
     
-    .tab1 .nav > li[class=active] > a {
-      background-color: white;
-      color: black;
-    }
-    
-    .tab1 .nav {
+    .tabStyle .nav > li > a {
       background-color: white;
       color: black;
     }
     
-    .tab1 .nav > li[class=active] > a[data-value='tab1'] {
+    .tabStyle .nav > li > a {
+      background-color: white;
+      color: black;
+    }
+    
+    .tabStyle .nav > li[class=active] > a {
       background-color: dimwhite;
       color: black;
     }
     
-    .tab1 .nav > li[class=active] > a[data-value='tab2'] {
+    .tabStyle .nav > li > a:hover {
+      background-color: dimwhite;
+      color: black;
+      
+    .tabSTyle .nav > li[class=active] > a:hover {
       background-color: dimwhite;
       color: black;
     }
-    
-    .tab1 .nav a:hover {
-      background-color: dimwhite;
-      color: black;
     }"
 ))
 
-
 mainCol <- function(input, output) {
   
-  output$color <- renderUI({
-    if (input$color %% 2 != 0) {
-      list(bodyCol <- tags$style(
+  output$dark <- renderUI({
+    if (input$darkmode %% 2 != 0) {
+      list(
+        bodyCol <- tags$style(
         '.content-wrapper {background-color: #2E2E2E;}'),
         boxCol <- tags$style(
           '
@@ -81,41 +82,39 @@ mainCol <- function(input, output) {
         tabCol <- tags$style(
           HTML(
             ".tabStyle .tab-content {
-      background-color: #404040;
-      border: none;
+            background-color: #404040;
+            color: black;
+            border: none;}
+    
+            .tabStyle .nav {
+              background-color: #404040;
+              color: black;
+              border: none;
             }
-    
-    .tabStyle .nav {
-      background-color: #404040;
-      border: none;
-    }
 
-    .tabStyle .nav > li > a {
-      background-color: #404040;
-      color: white;
-      border: none;
-    }
-    
-    .tabStyle .nav > li[class=active] > a {
-      background-color: dimgrey;
-      color:white;
-      border: none;
-    }
-    
-    .tabStyle .nav > li > a:hover {
-      background-color: dimgrey;
-      color: white;
-      border: none;
-    }
-    
-    .tabStyle .nav > li[class=active] > a:hover {
-      background-color: dimgrey;
-      color: white;
-      border: none;
-    }
-    
-
-    "
+            .tabStyle .nav > li > a {
+              background-color: #404040;
+              color: white;
+              border: none;
+            }
+            
+            .tabStyle .nav > li[class=active] > a {
+              background-color: dimgrey;
+              color:white;
+              border: none;
+            }
+            
+            .tabStyle .nav > li > a:hover {
+              background-color: dimgrey;
+              color: white;
+              border: none;
+            }
+            
+            .tabStyle .nav > li[class=active] > a:hover {
+              background-color: dimgrey;
+              color: white;
+              border: none;
+            }"
           )
         ))
     }

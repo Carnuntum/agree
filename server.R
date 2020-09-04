@@ -8,7 +8,10 @@ server <- function(input, output, session) {
   }
   #-------------------------------------------------------------------------------
   
-  
+  #docum tabitem -> onclick shinyjs is used to activate an expression or function
+  #when an html element is clicked -> also works with text links etc.
+  #-> find in docum file -> whole html element is hidden at first then will
+  #switch to visible when one of the buttons is pressed and vice versa
   lapply(list('imp_text', 'imp_text2', 'imp_text3'), onclick,
          toggle(id = 'test', anim = T))
   
@@ -29,6 +32,8 @@ server <- function(input, output, session) {
   
   
   ExampleTables(input, output)
+  
+  defaultOutAll(input, output)
   #-----------------------------------------------------------------------------
   #'*--------------------- SERVER LOGIC FOR CHI INPUT -------------------------*
   #-----------------------------------------------------------------------------
@@ -44,7 +49,7 @@ server <- function(input, output, session) {
   observeEvent(input$chiTest, chiOut(input, output, chiTableExp))
   
   #default output for the chi valueboxes
-  chiOutDefault(input, output)
+  #chiOutDefault(input, output)
   
   #real calculation from user input data 
   observeEvent(input$chiInput, c(chiOut(input, output, data = chiData())))
@@ -57,7 +62,7 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   #paExampleTable(input, output) #function for example data in s_percAgree.R
   #paExampleTablePN(input, output)
-  paOutDefault(input, output) #default output for valueboxes
+  #paOutDefault(input, output) #default output for valueboxes
   
   paData <- eval(paData, envir = environment())
   
@@ -72,12 +77,8 @@ server <- function(input, output, session) {
   #if run is pressed without userdata warning popup will be displayed
   #isolate hinders that anything happens when button is pressed without any
   #data uploaded.
-  pa_react_btn <- eventReactive(input$paRun,
-                         {T})
-  pn_react_btn <- eventReactive(input$pnRun,
-                                {T})
   
-  observeEvent(pa_react_btn(),
+  observeEvent(input$paRun,
                {
                  if (is.null(input$paInput)) {
                    btnPressWithoutData()
@@ -86,7 +87,7 @@ server <- function(input, output, session) {
                  }
                })
   
-  observeEvent(pn_react_btn(),
+  observeEvent(input$pnRun,
                {
                  if (is.null(input$pnInput)) {
                    btnPressWithoutData()
@@ -99,7 +100,7 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   #'*------------------------------- KAPPA ------------------------------------*
   #-----------------------------------------------------------------------------
-  kappaOutDefault(input, output)
+  #kappaOutDefault(input, output)
   #kappaExampleTable(input, output)
   
   kappaData <- reactive({ #user input data
@@ -123,7 +124,7 @@ server <- function(input, output, session) {
   #'*--------------------------- SPEARMAN RHO ---------------------------------*
   #-----------------------------------------------------------------------------
   #spearExp(input, output)
-  spearOutDefault(input, output)
+  #spearOutDefault(input, output)
   
   ordinalData <- reactive({ #user input data
     read.csv(input$ordinalInput$datapath)
@@ -186,12 +187,35 @@ server <- function(input, output, session) {
                })
   
   #-----------------------------------------------------------------------------
+  #'*----------------------------- POLYCHORIC ---------------------------------*
+  #-----------------------------------------------------------------------------
+  
+  polycData <- reactive({ #user input data
+    read.csv(input$polycInput$datapath)
+  })
+  
+  observeEvent(input$polycTest1, polycOut(input, output, polycXmp))
+  observeEvent(input$polycTest2, polycOut(input, output, polycXmp2))
+  
+  observeEvent(input$polycWarn, polycWarn())
+  
+  observeEvent(input$polycRun,
+               if(is.null(input$polycInput)) {
+                 btnPressWithoutData()
+               } else {
+                 dat <- polycData()
+                 if(dim(dat)[1] == dim(dat)[2]) {
+                   dat <- as.table(as.matrix(dat))
+                   polycOut(input, output, dat)
+                 } else {
+                   polycOut(input, output, polycData())
+                 }
+               })
+  #-----------------------------------------------------------------------------
   
   #-----------------------------------------------------------------------------
   
   mainCol(input, output)
-  #border-top-width: 20px;
-  
   
   btn_hover(input, output)
   #-------------------------------------------------------------------------------

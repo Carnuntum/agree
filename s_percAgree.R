@@ -166,7 +166,7 @@ percAgrPN <- tabItem(tabName = 'percAgrPN',
                          offset = 1,
                          style = 'padding: 0px;',
                          tabsetPanel(
-                           tabPanel(title = 'tab1',
+                           tabPanel(title = 'Example 1',
                            box(
                              title = 'Data Example 1',
                              width = NULL,
@@ -177,7 +177,7 @@ percAgrPN <- tabItem(tabName = 'percAgrPN',
                                style = 'float: right;'
                              )
                            )),
-                           tabPanel(title = 'tab2',
+                           tabPanel(title = 'Example 2',
                                     box(
                                       title = 'Data Example 2',
                                       width = NULL
@@ -244,63 +244,63 @@ percAgrPN <- tabItem(tabName = 'percAgrPN',
 #-------------------------------------------------------------------------------
 #'*---------------- DEFAULT INFORMATION FOR PA OUTPUT BOXES -------------------*
 #-------------------------------------------------------------------------------
-paOutDefault <- function(inp, out) {
-  output$paTotal <- renderValueBox({
-    
-      valueBox(value = h4('Total Percent Agreement',
-                          style = 'text-align: center;
-                                  padding: 15px;'), '')
-    
-  })
-  output$paExpected <- renderValueBox({
-    
-      valueBox(value = h4('Expected Percent Agreement',
-                          style = 'text-align: center;
-                                  padding: 15px;'), '')
-    
-  })
-  output$paUncategorized <- renderValueBox({
-    
-    valueBox(value = h4('Percent Agreement With Uncategorizations',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  
-  output$pn <- renderValueBox({
-    
-    valueBox(value = h4('Positive/Negative Percent Agreement',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  
-  output$pnCond <- renderValueBox({
-    
-    valueBox(value = h4('Conditional Positive/Negative PA',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  
-  output$kappa_pa <- renderValueBox({
-    
-    valueBox(value = h4('Category Specific Kappa Coefficient',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  
-  output$x2_pa <- renderValueBox({
-    
-    valueBox(value = h4('Chi Square Test for Significance',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  
-  output$mcnemar_pa <- renderValueBox({
-    
-    valueBox(value = h4('McNemar Test For Difference In Marginal Distribution',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-}
+# paOutDefault <- function(inp, out) {
+#   output$paTotal <- renderValueBox({
+#     
+#       valueBox(value = h4('Total Percent Agreement',
+#                           style = 'text-align: center;
+#                                   padding: 15px;'), '')
+#     
+#   })
+#   output$paExpected <- renderValueBox({
+#     
+#       valueBox(value = h4('Expected Percent Agreement',
+#                           style = 'text-align: center;
+#                                   padding: 15px;'), '')
+#     
+#   })
+#   output$paUncategorized <- renderValueBox({
+#     
+#     valueBox(value = h4('Percent Agreement With Uncategorizations',
+#                         style = 'text-align: center;
+#                                   padding: 15px;'), '')
+#   })
+#   
+#   output$pn <- renderValueBox({
+#     
+#     valueBox(value = h4('Positive/Negative Percent Agreement',
+#                         style = 'text-align: center;
+#                                   padding: 15px;'), '')
+#   })
+#   
+#   output$pnCond <- renderValueBox({
+#     
+#     valueBox(value = h4('Conditional Positive/Negative PA',
+#                         style = 'text-align: center;
+#                                   padding: 15px;'), '')
+#   })
+#   
+#   output$kappa_pa <- renderValueBox({
+#     
+#     valueBox(value = h4('Category Specific Kappa Coefficient',
+#                         style = 'text-align: center;
+#                                   padding: 15px;'), '')
+#   })
+#   
+#   output$x2_pa <- renderValueBox({
+#     
+#     valueBox(value = h4('Chi Square Test for Significance',
+#                         style = 'text-align: center;
+#                                   padding: 15px;'), '')
+#   })
+#   
+#   output$mcnemar_pa <- renderValueBox({
+#     
+#     valueBox(value = h4('McNemar Test For Difference In Marginal Distribution',
+#                         style = 'text-align: center;
+#                                   padding: 15px;'), '')
+#   })
+# }
 
 #-------------------------------------------------------------------------------
 #'*--------------- CALCULATED OUTPUT FOR PERCENT AGREEMENT --------------------*
@@ -460,27 +460,3 @@ pnOut <- function(input, output, data) {
   
 }
 
-#-------------------------------------------------------------------------------
-#'*------------------------- ERROR MESSAGES FOR USER --------------------------*
-#-------------------------------------------------------------------------------
-btnPressWithoutData <- function() {
-  showModal(
-    modalDialog(
-      title = 'Ups.. something went wrong!',
-      'You pressed run without supplying any data!',
-      easyClose = T,
-      style = 'text-align: center;'
-    )
-  )
-}
-
-pa_wrongCatNumber <- function() {
-  showModal(
-    modalDialog(
-      title = 'Something went wrong!',
-      'The categories integer you entered seems to be wrong!',
-      easyClose = T,
-      style = 'text-align: center;'
-    )
-  )
-}

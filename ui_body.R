@@ -29,7 +29,7 @@ body <- dashboardBody(
   #side <- tags$style(HTML('.skin-blue .main-sidebar .sidebar {background-color: darkcyan;}')),
   
   #changes in UI have to be registered here with the uiOutput function
-  uiOutput('color'),
+  uiOutput('dark'),
   uiOutput('bttnCol'),
   
   
@@ -42,6 +42,7 @@ body <- dashboardBody(
     percentAgree,
     percAgrPN,    # percentAgree is a subitem within the "all Methods" tabitem 
     cohenk,       # but the posNegPA is a subitem within the subitem and does
-    ordinalRank  # not belong here
+    ordinalRank,  # not belong here
+    polychor
   )               
 )

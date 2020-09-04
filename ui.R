@@ -21,5 +21,6 @@ options(scipen = 999)
 ui <- dashboardPage(header = header,
                     sidebar = sidebar,
                     body = body,
-                    skin = 'blue'
+                    skin = 'blue',
+                    useShinyjs()
 )
