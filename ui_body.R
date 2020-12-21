@@ -41,8 +41,13 @@ body <- dashboardBody(
     chi,
     percentAgree,
     percAgrPN,    # percentAgree is a subitem within the "all Methods" tabitem 
-    cohenk,       # but the posNegPA is a subitem within the subitem and does
+    cohenk,
+    odds,         # but the posNegPA is a subitem within the subitem and does
     ordinalRank,  # not belong here
-    polychor
+    polychor,
+    icc,
+    omega,
+    krippendorf,
+    CCC
   )               
 )

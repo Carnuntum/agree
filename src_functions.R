@@ -1,43 +1,230 @@
 #-------------------------------------------------------------------------------
-#'*----------------------- DATA EXAMPLE TABLES --------------------------------*
+#'*------------------------ GERNERAL SET FUNCTIONS ----------------------------*
 #-------------------------------------------------------------------------------
-ExampleTables <- function(input, output) {
+#create tabset panel with one tabpanel inside for setting the example/user data
+#in the output tabset panel
+create_tabset <- function(output,
+                        out_id,
+                        id,
+                        tabTitle,
+                        boxTitle,
+                        tableId,
+                        downId,
+                        btnInputId) {
+
+
+  tab <- tabPanel(
+    title = tabTitle,
+    box(
+      title = boxTitle,
+      width = NULL,
+      tableOutput(tableId),
+      downloadButton(
+        outputId = downId,
+        label = '',
+        style = 'float: right;'
+      ),
+      actionButton(
+        inputId = btnInputId,
+        label = 'test run',
+        style = 'float: right;'
+      )
+    )
+  )
   
-  output$expChi <- function() {
-    kable(chiTableExp, format = 'html') %>%
-      kable_styling('basic')
-  }
-  
-  output$expPA <- function() {
-    kable(percAgrTableExp, format = 'html') %>%
-      kable_styling(bootstrap_options = 'basic')
-  }
-  
-  output$expPN <- function() {
-    kable(percAgrPosNeg, format = 'html') %>%
-      kable_styling(bootstrap_options = 'basic')
-  }
-  
-  output$expKappa <- function() {
-    kable(kappaTableExample, format = 'html') %>%
-      kable_styling('basic')
-  }
-  
-  output$expSpear <- function() {
-    kable(spearmanTableExample, format = 'html') %>%
-      kable_styling('basic')
-  }
-  
-  output$expPolyc1 <- function() {
-    kable(polycXmp, format = 'html') %>%
-      kable_styling('basic')
-  }
-  
-  output$expPolyc2 <- function() {
-    kable(polycXmp2, format = 'html') %>%
-      kable_styling('basic')
+  output[[out_id]] <- renderUI({
+    tabsetPanel(id = id,
+                tab)
+  })
+
+}
+
+make_xmp_table <- function(output, out_id, data) {
+  output[[out_id]] <- function() {
+    kableExtra::kable(data, format = 'html') %>%
+      kableExtra::kable_styling('basic')
   }
 }
+
+#update a given tabsetpanel with title and box title
+set_tabset <- function(output,
+                       out_id,
+                       id,
+                       tabTitle = 'Example',
+                       boxTitle = 'Data',
+                       tableId,
+                       downId,
+                       btnInputId,
+                       data) {
+  create_tabset(output, out_id, id, tabTitle, boxTitle, tableId, downId, btnInputId)
+  make_xmp_table(output, tableId, data = data)
+}
+
+#make example output
+
+
+#-------------------------------------------------------------------------------
+#'*----------------------- DATA EXAMPLE TABLES --------------------------------*
+#-------------------------------------------------------------------------------
+#polychoric extrawurst
+t <- tabPanel(
+  title = 'Example 2',
+  box(
+    title = 'Data',
+    width = NULL,
+    tableOutput('tab_polyc2'),
+    downloadButton(
+      outputId = 'down_polyc2',
+      label = '',
+      style = 'float: right;'
+    ),
+    actionButton(
+      inputId = 'test_polyc2',
+      label = 'test run',
+      style = 'float: right;'
+    )
+  )
+)
+
+polyAppendTab <- function(session) {
+  session$onFlushed(function() {
+    appendTab('id_polyc', t)
+    updateTabsetPanel(session, "id_polyc")
+  })
+}
+
+ExampleTables <- function(input, output) {
+  
+  n_l <- c('chi','odds','pa','pn','kappa')
+  dat <- list(xmp_chi, xmp_odds, xmp_pa, xmp_pn, xmp_kappa)
+  
+  
+  set_tabset(output, out_id = 'ui_chi', id = 'id_chi', tableId = 'tab_chi', downId = 'down_chi',
+             btnInputId = 'test_chi', data = dat[[1]])
+
+  set_tabset(output, out_id = 'ui_odds', id = 'id_odds', tableId = 'tab_odds', downId = 'down_odds',
+             btnInputId = 'test_odds', data = dat[[2]])
+
+  set_tabset(output, out_id = 'ui_pa', id = 'id_pa', tableId = 'tab_pa', downId = 'down_pa',
+             btnInputId = 'test_pa', data = xmp_pa)
+
+  set_tabset(output, out_id = 'ui_pn', id = 'id_pn', tableId = 'tab_pn', downId = 'down_pn',
+             btnInputId = 'test_pn', data = xmp_pn)
+
+  set_tabset(output, out_id = 'ui_kappa', id = 'id_kappa', tableId = 'tab_kappa', downId = 'down_kappa',
+             btnInputId = 'test_kappa', data = xmp_kappa)
+  
+  set_tabset(output, out_id = 'ui_spear', id = 'id_spear', tableId = 'tab_spear', downId = 'down_spear',
+             btnInputId = 'test_spear', data = xmp_spear)
+  
+  set_tabset(output, out_id = 'ui_polyc1', id = 'id_polyc', tableId = 'tab_polyc1', downId = 'down_polyc1',
+             btnInputId = 'test_polyc1', data = xmp_poly1)
+  
+  make_xmp_table(output, 'tab_polyc2', xmp_poly2)
+  
+  set_tabset(output, out_id = 'ui_icc', id = 'id_icc', tableId = 'tab_icc', downId = 'down_icc',
+             btnInputId = 'test_icc', data = xmp_icc)
+  
+  set_tabset(output, out_id = 'ui_omega', id = 'id_omega', tableId = 'tab_omega', downId = 'down_omega',
+             btnInputId = 'test_omega', data = xmp_omega)
+  
+  set_tabset(output, out_id = 'ui_kripp', id = 'id_kripp', tableId = 'tab_kripp', downId = 'down_kripp',
+             btnInputId = 'test_kripp', data = xmp_kripp)
+  
+  
+  cccTemp <<- round(xmp_ccc[1:10,], 3)
+  lapply(cccTemp, as.character)
+  cccTemp[[1]][10] = '...'
+  cccTemp[[2]][10] = '...'
+  
+  set_tabset(output, out_id = 'ui_ccc', id = 'id_ccc', tableId = 'tab_ccc', downId = 'down_ccc',
+             btnInputId = 'test_ccc', data = cccTemp)
+  
+  #make_xmp_table(output, 'expccc1', cccTemp)
+  
+}
+
+#-------------------------------------------------------------------------------
+#'*------------------------ SHOW UPLOADED DATA FUN ----------------------------*
+#-------------------------------------------------------------------------------
+
+# show_uploaded <- function(output, id, data) {
+#   switch(id,
+#          chi = output$expChi <- function() {
+#            kableExtra::kable(data, format = 'html') %>%
+#              kableExtra::kable_styling('basic')
+#          },
+#          
+#          tab_odds = output$expodds1 <- function() {
+#            kableExtra::kable(data, format = 'html') %>%
+#              kableExtra::kable_styling('basic')
+#          },
+#          
+#          pa = output$expPA <- function() {
+#            kableExtra::kable(data, format = 'html') %>%
+#              kableExtra::kable_styling(bootstrap_options = 'basic')
+#          },
+#          
+#          pn = output$expPN <- function() {
+#            kableExtra::kable(data, format = 'html') %>%
+#              kableExtra::kable_styling(bootstrap_options = 'basic')
+#          },
+#          
+#          kappa = output$expKappa <- function() {
+#            kableExtra::kable(data, format = 'html') %>%
+#              kableExtra::kable_styling('basic')
+#          },
+#          
+#          spear = output$expSpear <- function() {
+#            kableExtra::kable(data, format = 'html') %>%
+#              kableExtra::kable_styling('basic')
+#          },
+#          
+#          polyc = output$expPolyc1 <- function() {
+#            kableExtra::kable(data, format = 'html') %>%
+#              kableExtra::kable_styling('basic')
+#          },
+#          
+#          icc = output$expIcc1 <- function() {
+#            kableExtra::kable(data, format = 'html') %>% 
+#              kableExtra::kable_styling('basic')
+#          },
+#          
+#          omega = output$expOmega1 <- function() {
+#            kableExtra::kable(data, format = 'html') %>% 
+#              kableExtra::kable_styling('basic')
+#          },
+#          
+#          kripp = output$expKripp1 <- function() {
+#            kableExtra::kable(data, format = 'html') %>% 
+#              kableExtra::kable_styling('basic', font_size = '10')
+#          },
+#          
+#          ccc = output$expccc1 <- function() {
+#            cccTemp <- round(data[1:10,], 3)
+#            lapply(cccTemp, as.character)
+#            cccTemp[[1]][10] = '...'
+#            cccTemp[[2]][10] = '...'
+#            kableExtra::kable(cccTemp, format = 'html') %>% 
+#              kableExtra::kable_styling('basic', font_size = '12')
+#          }
+#          
+#          )
+#   
+# }
+
+#-------------------------------------------------------------------------------
+#'*------------------------ CHANGE TAB PANEL TITLE ----------------------------*
+#-------------------------------------------------------------------------------
+# change_tab_title <- function(input, output, id) {
+#   switch(id,
+#          chi = ,
+#          odds = ,
+#          pa = ,
+#          pn = ,)
+# }
+
+
 
 #-------------------------------------------------------------------------------
 #'*------------------------- DEFAULT OUTPUT FOR ALL ---------------------------*
@@ -49,62 +236,29 @@ defaultOutAll <- function(input, output) {
 #'*--------------------------------- CHI --------------------------------------*
 #-------------------------------------------------------------------------------
 
-  output$chiUncor <- renderValueBox({
-    if (is.null(input$chiInput)) {
-      valueBox(value = h5('Statistic uncorrected'), '')
-    }
+  output$chi1 <- renderValueBox({
+      valueBox(value = h4('Output'), '')
   })
-  output$chiCor <- renderValueBox({
-    if (is.null(input$chiInput)) {
-      valueBox(value = h5('Statistic corrected'), '')
-    }
-  })
-  output$contingencyCoeff <- renderValueBox({
-    if (is.null(input$chiInput)) {
-      valueBox(value = h5('Contingency Coefficient C'), '')
-    }
-  })
+  
+#'*-------------------------------- ODDS --------------------------------------*
+#-------------------------------------------------------------------------------
 
+  
+  output$odds1 <- renderValueBox({
+    if (is.null(input$chiInput)) {
+      valueBox(value = h4('Output'), '')
+    }
+  })
   
 #'*-------------------------- PERCENT AGREEMENT -------------------------------*
 #-------------------------------------------------------------------------------
-  output$paTotal <- renderValueBox({
-    valueBox(value = h4('Total Percent Agreement',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  output$paExpected <- renderValueBox({
-    valueBox(value = h4('Expected Percent Agreement',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  output$paUncategorized <- renderValueBox({
-    valueBox(value = h4('Percent Agreement With Uncategorizations',
+  output$pa <- renderValueBox({
+    valueBox(value = h4('Output',
                         style = 'text-align: center;
                                   padding: 15px;'), '')
   })
   output$pn <- renderValueBox({
-    valueBox(value = h4('Positive/Negative Percent Agreement',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  output$pnCond <- renderValueBox({
-    valueBox(value = h4('Conditional Positive/Negative PA',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  output$kappa_pa <- renderValueBox({
-    valueBox(value = h4('Category Specific Kappa Coefficient',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  output$x2_pa <- renderValueBox({
-    valueBox(value = h4('Chi Square Test for Significance',
-                        style = 'text-align: center;
-                                  padding: 15px;'), '')
-  })
-  output$mcnemar_pa <- renderValueBox({
-    valueBox(value = h4('McNemar Test For Difference In Marginal Distribution',
+    valueBox(value = h4('Output',
                         style = 'text-align: center;
                                   padding: 15px;'), '')
   })
@@ -112,19 +266,7 @@ defaultOutAll <- function(input, output) {
 #'*---------------------------------- KAPPA -----------------------------------*
 #-------------------------------------------------------------------------------
   output$kappa1 <- renderValueBox({
-    if (is.null(input$kappaInput)) {
-      valueBox(value = h5(''), subtitle = "Cohen's Kappa")
-    }
-  })
-  output$pi1 <- renderValueBox({
-    if (is.null(input$kappaInput)) {
-      valueBox(value = h5(''), "Scott's Pi")
-    }
-  })
-  output$fleissKappa <- renderValueBox({
-    if (is.null(input$kappaInput)) {
-      valueBox(value = h5(''), "Fleiss' Kappa")
-    }
+    valueBox(value = h4(''), subtitle = "Output")
   })
   
 #'*------------------------------- ORDINAL RANK -------------------------------*
@@ -135,7 +277,7 @@ defaultOutAll <- function(input, output) {
                                   padding: 15px;'), '')
   })
   
-#'*------------------------------- ORDINAL RANK -------------------------------*
+#'*------------------------------- POLYCHORIC ---------------------------------*
 #-------------------------------------------------------------------------------
   output$polyc1 <- renderValueBox({
     valueBox(value = h4("Output",
@@ -143,8 +285,32 @@ defaultOutAll <- function(input, output) {
                                   padding: 15px;'), '')
   })
   
-}
+#'*--------------------------------- ICC --------------------------------------*
+#-------------------------------------------------------------------------------
+  output$icc1 <- renderValueBox({
+    valueBox(value = h4("Output",
+                        style = 'text-align: center;
+                                padding: 15px;'), '')
+  })
+  
+#'*------------------------------- KRIPP --------------------------------------*
+#-------------------------------------------------------------------------------
+  output$kripp1 <- renderValueBox({
+    valueBox(value = h4("Output",
+                        style = 'text-align: center;
+                                padding: 15px;'), '')
+  })
 
+#'*--------------------------------- CCC --------------------------------------*
+#-------------------------------------------------------------------------------
+  output$ccc1 <- renderValueBox({
+    valueBox(value = h4("Output",
+                        style = 'text-align: center;
+                                padding: 15px;'), '')
+  })
+  
+  
+}
 
 
 
@@ -274,7 +440,9 @@ text_percAgrPN <- c('uncorrected:  X', '<sup>2</sup>', ' = ',
                          ' df = ', expression(as.numeric(test$chidfCor)))
 
 
-odds <- function(data, alpha = 0.05) {
+odds_ <- function(data, alpha = 0.05) {
+  
+  data <- as.matrix(data)
   
   q <- (data[1] * data[4]) / (data[3] * data[2])
   
@@ -312,7 +480,7 @@ odds <- function(data, alpha = 0.05) {
   return(list('oddsRatio' = q,
               'zCrit' = zCrit,
               'logOdds' = lnQ,
-              'logSdtErr' = stdErr_lnQ,
+              'logStdErr' = stdErr_lnQ,
               'zLog' = zLN,
               'zYule' = zY,
               'yuleY' = Y,
@@ -327,6 +495,39 @@ odds <- function(data, alpha = 0.05) {
               'transformedOddsUB' = transfQHigh))
 }
 
+kap_scott_fleiss <- function(data, method) {
+  tryCatch({
+    if(method == 'kappa') {
+      return(list('values' = irr::kappa2(data),
+                  'err' = NULL)
+             )
+    }
+    else if(method == 'spi') {
+      return(list(
+        'values' = rel::spi(data, weight = 'unweighted'),
+        'err' = NULL
+      ))
+    }
+    else if(method == 'fleissKappa') {
+      return(list(
+        'values' = irr::kappam.fleiss(data),
+        'err' = NULL
+      ))
+    }
+  }, error = function(e) {
+    err <- conditionMessage(e)
+    return(list(
+      'values' = NULL,
+      'err' = err
+    ))
+  }, warning = function(w) {
+    warn <- conditionMessage(w)
+    return(list(
+      'values' = NULL,
+      'err' = warn
+    ))
+  })
+}
 
 #-------------------------------------------------------------------------------
 #'*---------------------------- HELPER FUNCTIONS ------------------------------*
@@ -341,7 +542,14 @@ odds <- function(data, alpha = 0.05) {
 #     )
 # }
 help_check_ties <- function(data) {
-  return(any(sapply(data, duplicated)))
+  tryCatch({
+    return(any(sapply(data, duplicated)))
+    
+  }, error = function(e) {
+    print(e)
+  }, warning = function(w) {
+    print(w)
+  })
 }
 
 
@@ -364,9 +572,14 @@ help_tauInt_sort <- function(data) {
 #'*------------------------ HELPER FUNCTIONS END ------------------------------*
 #-------------------------------------------------------------------------------
 
+
+#-------------------------------------------------------------------------------
+#'*---------------------------- INTRACLASS TAU --------------------------------*
+#-------------------------------------------------------------------------------
+
 intraclassTau <- function(data) {
   nn <- help_tauInt_sort(data)
-  nn <- pivot_longer(nn,
+  nn <- tidyr::pivot_longer(nn,
                      cols = 1:2,
                      names_to = 'new',
                      values_to = 'nums')
@@ -415,9 +628,11 @@ intraclassTau <- function(data) {
     }
   }, error = function(e) {
     print(paste('following error occured: ', e))
+  }, warning = function(w) {
+    print(conditionMessage(w))
+    
   })
   
-            
   
   return (list('S' = S, 'N' = N,
                'Sp' = Sp, 'sigma' = sig,
@@ -425,8 +640,28 @@ intraclassTau <- function(data) {
                'p.value' = p))
 }
 
+#-------------------------------------------------------------------------------
+#'*-------------------------------- ODDS  -------------------------------------*
+#-------------------------------------------------------------------------------
+
+oddsMain <- function(data, alpha) {
+  tryCatch({
+    test <- odds_(data, alpha)
+    
+  }, error = function(e) {
+    print(e)
+  }, warning = function(w) {
+    print(w)
+  })
+}
 
 
+
+
+
+#-------------------------------------------------------------------------------
+#'*--------------------------- SPEARMAN KENDALL  ------------------------------*
+#-------------------------------------------------------------------------------
 
 
 ordinals <- function(data, method) {
@@ -437,9 +672,9 @@ ordinals <- function(data, method) {
     }
     else if(method == 'kendW') {
       if(help_check_ties(data)) {
-        kendall(data, correct = T)
+        irr::kendall(data, correct = T)
       } else {
-        kendall(data)
+        irr::kendall(data)
       }
     }
     #tau A and B are the same B is used in the cor.test function because its
@@ -453,23 +688,176 @@ ordinals <- function(data, method) {
     else if (method == 'tauIntra') {
       intraclassTau(data)
     }
-  },
-  error = function(e) {
+  },error = function(e) {
     print(e)
+    
   })
 }
 
+#-------------------------------------------------------------------------------
+#'*------------------------------ POLYCHORIC ----------------------------------*
+#-------------------------------------------------------------------------------
 
-polyc <- function(data) {
+polyc <- function(data, method) {
   tryCatch({
-    return(list('values' = psych::polychoric(data),
-                'warn' = names(last.warning)
-                )
-           )
+    
+    
+    if(method == 'polychoric') {
+      return(list('values' = warning_handler(psych::polychoric(data)),
+                  'warn' = msg))
+    }
+    else if (method == 'kruskalG') {
+      return(
+        list(
+          'values' = DescTools::GoodmanKruskalGamma(data, conf.level = 0.95),
+          'warn' = NULL))
+    }
+    else if (method == 'kruskalT') {
+      return(
+        list(
+          'valuesR' = DescTools::GoodmanKruskalTau(data,
+                                                   direction = 'row',
+                                                   conf.level = 0.95),
+          'valuesC' = DescTools::GoodmanKruskalTau(data,
+                                                   direction = 'col',
+                                                   conf.level = 0.95),
+          'warn' = NULL))
+    }
+    
+    
+  }, error = function(e) {
+    err <- conditionMessage(e)
+    return(list(
+      'values' = NULL,
+      'warn' = err
+    ))
+    
+  }, warning = function(w) {
+    warn <- warnings()
+    return(
+      list(
+        'values' = tryCatch({
+          psych::polychoric(data)
+          }, 
+          error = function(e) {
+            print(e)
+            }
+          ),
+        'warn' = warn))
+    })
+}
+
+
+#-------------------------------------------------------------------------------
+#'*--------------------------------- ICC --------------------------------------*
+#-------------------------------------------------------------------------------
+
+
+iccMain <- function(input, output, data, test) {
+  
+  choices <- c(input$iccChoices, input$iccChoices1, input$iccChoices2)
+  
+  
+  if(test) {
+    if(length(choices) != 3) {
+      tooManyIcc(output)
+    } else {
+    return(irr::icc(ratings = data, model = choices[1], 
+                    type = choices[2], unit = choices[3]))
+    }
+  } else {
+    
+    if(length(choices) != 3) {
+      tooManyIcc(output)
+    } else {
+      
+      tryCatch({
+        
+        return(irr::icc(ratings = data, model = choices[1], 
+                        type = choices[2], unit = choices[3]))
+        
+      }, error = function(e) {
+        print('src_funtion_icc_e')
+        print(e)
+        iccErrOut(output)
+      }, warning = function(w) {
+        print('src_function_icc_w')
+        print(w)
+        iccErrOut(output)
+      })
+      
+    }
+  }
+}
+
+#-------------------------------------------------------------------------------
+#'*------------------------------- OMEGA --------------------------------------*
+#-------------------------------------------------------------------------------
+isolate(omegaMain <- function(input, output, data) {
+  
+  isolate(choices <- tolower(c(input$omegaChoices, input$omegaChoices1, input$omegaChoices2)))
+  
+  tryCatch({
+    if(length(choices) != 3) {
+      tooManyOmega()
+    }
+    else {
+      return(sklarsomega::sklars.omega(data, level = choices[1],
+                                       confint = choices[2],
+                                       control = list(
+                                         bootit = 20, parallel = T,
+                                         nodes = parallel::detectCores()-1,
+                                         dist = choices[3])
+                                       )
+             )
+    }
   }, error = function(e) {
     print(e)
+    globalOmegaWarn <<- conditionMessage(e)
+  }, warning = function(w) {
+    print(w)
+    globalOmegaWarn <<- conditionMessage(w)
   })
+})
 
+#-------------------------------------------------------------------------------
+#'*------------------------------- KRIPP --------------------------------------*
+#-------------------------------------------------------------------------------
+
+krippMain <- function(input, output, data) {
+  tryCatch({
+    choice <- input$krippChoice
+    
+    test <- irr::kripp.alpha(x = data, method = choice)
+    
+    
+  }, error = function(e) {
+    print(e)
+  }, warning = function(w) {
+    print(w)
+  })
+}
+
+#-------------------------------------------------------------------------------
+#'*--------------------------------- CCC --------------------------------------*
+#-------------------------------------------------------------------------------
+
+cccMain <- function(input, output, data) {
+  choice <- input$cccChoice
+  
+  tryCatch({
+    test <- DescTools::CCC(x = data[,1], y = data[,2], ci = choice,
+                           conf.level = 0.95, na.rm = T)
+    
+    
+  }, error = function(e) {
+    print('src_function_ccc_e')
+    print(e)
+  }, warning = function(w) {
+    ccc_global_warnings <<- warnings()
+    print('src_function_ccc_w')
+    print(w)
+  })
 }
 
 

@@ -1,9 +1,9 @@
 {
-    "path": "C:/Users/Aureus/Google Drive/1_Psychologie Master/2. Masterarbeit/1_git_shiny_project",
-    "sortOrder": [
+    "path" : "C:/Users/Aureus/Google Drive/1_Psychologie Master/2. Masterarbeit/1_git_shiny_project",
+    "sortOrder" : [
         {
-            "columnIndex": 2,
-            "ascending": true
+            "ascending" : true,
+            "columnIndex" : 2
         }
     ]
 }

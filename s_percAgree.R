@@ -21,8 +21,7 @@ percentAgree <- tabItem(
                   box(
                     width = NULL,
                     style = 'text-align:center; padding: 30px;',
-                    h3('Percent Agreement for 2 by \
-                       2 or 2 by n contingency tables')
+                    h3('Total Percent Agreement')
                   )
           )
   ),
@@ -34,11 +33,7 @@ percentAgree <- tabItem(
         box(
           width = NULL,
           height = '105px',
-          p(
-            'On the right side you can upload your 2 by 2 or 2 by n data \
-          via a .csv file and type the number of categories for which ratings \
-          were applied'
-          ),
+          p(file_upload_text),
           style = 'text-align: center;'
         )
       ),
@@ -46,7 +41,8 @@ percentAgree <- tabItem(
         box(
           width = NULL,
           height = '105px',
-          p('The data has to have the following structure:'),
+          p(file_struct_text),
+          look_down,
           style = 'text-align: center;'
         )
       )
@@ -68,41 +64,19 @@ percentAgree <- tabItem(
     )
   ),
   fluidRow(
+    class = 'tabStyle',
     column(
       width = 5,
       offset = 1,
       style = 'padding: 0px;',
-      box(
-        title = 'Data Example',
-        width = NULL,
-        tableOutput('expPA'),
-        actionButton(
-          inputId = 'paTest',
-          label = 'test run',
-          style = 'float: right;'
-        )
-      )
+      uiOutput('ui_pa')
     ),
     
     column(width = 5,
            fluidRow(class = 'style_valuebox_PA_cyan',
                     column(
                       width = 12,
-                      valueBoxOutput(outputId = 'paTotal',
-                                     width = NULL)
-                    )
-           ),
-           fluidRow(class = 'style_valuebox_PA_cyan',
-                    column(
-                      width = 12,
-                      valueBoxOutput(outputId = 'paExpected',
-                                     width = NULL)
-                    )
-           ),
-           fluidRow(class = 'style_valuebox_PA_cyan',
-                    column(
-                      width = 12,
-                      valueBoxOutput(outputId = 'paUncategorized',
+                      valueBoxOutput(outputId = 'pa',
                                      width = NULL)
                     )
            )
@@ -119,8 +93,7 @@ percAgrPN <- tabItem(tabName = 'percAgrPN',
                          box(
                            width = NULL,
                            style = 'text-align:center; padding: 30px;',
-                           h3('Percent Agreement for 2 by \
-                       2 or 2 by n contingency tables')
+                           h3('Category Specific Percent Agreement')
                          )
                        )
                      ),
@@ -132,8 +105,7 @@ percAgrPN <- tabItem(tabName = 'percAgrPN',
                            box(
                              width = NULL,
                              height = '105px',
-                             p('On the right side you can upload your 2 by 2
-          via a .csv file'),
+                             p(file_upload_text),
                              style = 'text-align: center;'
                            )
                          ),
@@ -141,7 +113,8 @@ percAgrPN <- tabItem(tabName = 'percAgrPN',
                            box(
                              width = NULL,
                              height = '105px',
-                             p('The data has to have the following structure:'),
+                             p(file_struct_text),
+                             look_down,
                              style = 'text-align: center;'
                            )
                          )
@@ -165,24 +138,7 @@ percAgrPN <- tabItem(tabName = 'percAgrPN',
                          width = 5,
                          offset = 1,
                          style = 'padding: 0px;',
-                         tabsetPanel(
-                           tabPanel(title = 'Example 1',
-                           box(
-                             title = 'Data Example 1',
-                             width = NULL,
-                             tableOutput('expPN'),
-                             actionButton(
-                               inputId = 'pnTest',
-                               label = 'test run',
-                               style = 'float: right;'
-                             )
-                           )),
-                           tabPanel(title = 'Example 2',
-                                    box(
-                                      title = 'Data Example 2',
-                                      width = NULL
-                                    ))
-                         )
+                         uiOutput('ui_pn')
                        ),
                        
                        column(
@@ -191,30 +147,6 @@ percAgrPN <- tabItem(tabName = 'percAgrPN',
                                   column(
                                     width = 12,
                                     valueBoxOutput(outputId = 'pn',
-                                                   width = NULL)
-                                  )),
-                         fluidRow(class = 'style_valuebox_PA_cyan',
-                                  column(
-                                    width = 12,
-                                    valueBoxOutput(outputId = 'pnCond',
-                                                   width = NULL)
-                                  )),
-                         fluidRow(class = 'style_valuebox_PA_cyan',
-                                  column(
-                                    width = 12,
-                                    valueBoxOutput(outputId = 'kappa_pa',
-                                                   width = NULL)
-                                  )),
-                         fluidRow(class = 'style_valuebox_PA_cyan',
-                                  column(
-                                    width = 12,
-                                    valueBoxOutput(outputId = 'x2_pa',
-                                                   width = NULL)
-                                  )),
-                         fluidRow(class = 'style_valuebox_PA_cyan',
-                                  column(
-                                    width = 12,
-                                    valueBoxOutput(outputId = 'mcnemar_pa',
                                                    width = NULL)
                                   ))
                        )
@@ -314,60 +246,32 @@ paOut <- function(input, output, data) {
     print(e)
   })
   
-  output$paTotal <- renderValueBox({
+  d_pa <- t(data.frame(
+    'Total Percent Agreement' = test$total,
+    'Expected Percent Agreement' = test$expected,
+    'PA With Uncategorization' = if(!is.null(test$uncategorized)) {
+      test$uncategorized
+    } else {
+      'no missings'  
+    }
+  ))
+  
+  l_pa <<- lapply(d_pa, as.data.frame)
+  
+  output$pa <- renderValueBox({
     
     valueBox(
-      value = h4('Total Percent Agreement',
-                         style = 'text-align: center;
-                                  padding-top: 10px;')
-      ,
-      subtitle = 
-        p(
-          HTML(
-            paste0(
-              round(as.numeric(test$total), 3),
-              br()
-        )
+      value = p(HTML(
+        kableExtra::kable(d_pa, format = 'html') %>% 
+          kableExtra::kable_styling('basic'),
+        
       ),
-      style = 'text-align: center;
-              font-size: 25px;')
-    )
-  })
-  
-    
-  output$paExpected <- renderValueBox({
-    valueBox(
-      value = h4('Expected Percent Agreement',
-                 style = 'text-align: center;
-                                  padding-top: 10px;')
-      ,
-      subtitle =
-        h5(HTML(paste0(round(
-          as.numeric(test$expected), 3
-        ), '<br/>')
-      ),
-      style = 'text-align: center;
-              font-size: 25px;'))
-  })
-  
-  output$paUncategorized <- renderValueBox({
-    valueBox(
-      value = h4('Percent Agreement With Uncategorizations',
-                 style = 'text-align: center;
-                          padding-top: 10px;')
-      ,
-      subtitle = 
-        if(test$uncat == F) {h5('No Missing Categorizations',
-                                style = 'text-align: center;')}
-        else {
-          h5(HTML(
-            paste0(
-              round(as.numeric(test$uncategorized), 3),'<br/>'
-            )
-          ),
-          style = 'text-align: center;
-                  font-size: 25px;')
-        }
+      div(
+        downloadButton(outputId = 'paFullDown',
+                       label = 'Full Results'),
+        style = 'text-align: center;'
+      )),
+      subtitle = ''
     )
   })
 }
@@ -381,81 +285,51 @@ pnOut <- function(input, output, data) {
     print(e)
   })
   
-  homoPA <- mcnemar.test(data[,1], data[,2])
+  homoPA <- tryCatch({
+    mcnemar.test(data[,1], data[,2])
+  }, error = function(e) {
+    print(e)
+  }, warning = function(w) {
+    print(w)
+  })
+  
+  d_pn <- t(data.frame(
+    'pos' = test$paPos,
+    'neg' = test$paNeg,
+    'cond.pos' = test$paPosSF,
+    'cond.neg' = test$paNegSF,
+    'kappa pos' = test$kPos,
+    'kappa neg' = test$kNeg,
+    'chi uncorr' = test$chiUncor,
+    'chi corr' = test$chiValCor,
+    'p-value uncorr' = test$chipUncor,
+    'p-value corr' = test$chipCor,
+    'df uncorr' = test$chidfUncor,
+    'df corr' = test$chidfCor,
+    'chi homogeneity' = homoPA$statistic,
+    'p-value' = homoPA$p.value,
+    'df' = homoPA$parameter
+  ))
+  dimnames(d_pn)[2] <- NULL
+  
+  d <<- d_pn
+  
+  l_pn <<- lapply(d_pn, as.data.frame)
   
   output$pn <- renderValueBox({
     valueBox(
-      value = h4('Positive/Negative PA',
-                 style = 'text-align: center;
-                                  padding-top: 10px;')
-      ,
-      subtitle =
-        h5(HTML(paste0('+ ', round(test$paPos, 3), '<br/>',
-                       '- ', round(test$paNeg, 3))
-        ),
-        style = 'text-align: center;
-              font-size: 25px;'))
-  })
-  
-  output$pnCond <- renderValueBox({
-    valueBox(
-      value = h4('Conditional Positive/Negative PA',
-                 style = 'text-align: center;
-                                  padding-top: 10px;')
-      ,
-      subtitle =
-        h5(HTML(paste0('+ ', round(test$paPosSF, 3), '<br/>',
-                       '- ', round(test$paNegSF, 3))
-        ),
-        style = 'text-align: center;
-              font-size: 25px;'))
-  })
-  
-  output$kappa_pa <- renderValueBox({
-    valueBox(
-      value = h4('Positive/Negative Kappa Coefficient',
-                 style = 'text-align: center;
-                                  padding-top: 10px;')
-      ,
-      subtitle =
-        h5(HTML(paste0('+ ', round(as.numeric(test$kPos), 3), '<br/>',
-                       '- ', round(as.numeric(test$kNeg), 3))
-        ),
-        style = 'text-align: center;
-              font-size: 25px;'))
-  })
-  
-  
-  output$x2_pa <- renderValueBox({
-    valueBox(
-      value = h4('Chi Square Test for Significance',
-                 style = 'text-align: center;
-                                  padding-top: 5px;')
-      ,
-      subtitle =
-        h5(HTML(paste0(lapply(text_percAgrPN, eval, environment()))
-        ),
-        style = 'text-align: center;
-              font-size: 18px;'))
-  })
-  
-  output$mcnemar_pa <- renderValueBox({
-      valueBox(
-        width = 10,
-        value = h4(paste0('McNemar Test for Homogeneity'),
-                   style = 'text-align: center;
-                            padding-top: 5px;')
-        ,
-        subtitle =
-          h5(HTML(paste0('X', tags$sup('2'), ' = ', round(homoPA$statistic, 3),
-                         br(),
-                         'p = ', round(homoPA$p.value, 3), 
-                         br(),
-                         'df = ', round(homoPA$parameter, 3))
-          ),
-          style = 'text-align: center;
-                   font-size: 18px;'))
-      
+      value = p(HTML(
+        kableExtra::kable(round(d_pn, 3), format = 'html') %>% 
+          kableExtra::kable_styling('basic'),
+        
+      ),
+      div(
+        downloadButton(outputId = 'pnFullDown',
+                       label = 'Full Results'),
+        style = 'text-align: center;'
+      )),
+      subtitle = ''
+    )
   })
   
 }

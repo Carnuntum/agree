@@ -1,0 +1,35 @@
+- cleanup app
+	-> remove unneccessary text, ui elements
+	-> line up ui design
+	-> download btn for full results for all measures
+	-> download btn for example data
+- documentation 
+	-> what is the app for, for who, how to use
+	-> link to paper
+	-> full paper in app? at least link to paper
+
+- information for every measure 
+	-> how to use, how to interpret (cut offs etc.)
+		-> via buttons?
+		-> via clickable text element?
+
+- information of used packages and functions 
+	-> links to online documentation
+
+- link to github repo with source code
+
+- write paper
+
+- find additional measures:
+	-> huberts kappa
+	-> delta, multi-rater delta -> not able to implement this
+	-> gamma, multi-gamma for unitizing data? -> im surely not able to implement this
+	
+	- possible to implement:
+		
+		-> congers kappa -> package irr -> kappam.fleiss(data, exact = T)
+		-> limits of agreement
+		-> bland altman plot
+		-> mean squared deviation
+		-> total deviation index
+

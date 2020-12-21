@@ -1,4 +1,4 @@
-source('text.R')
+#source('text.R')
 
 documentation <- tabItem(tabName = 'docum',
                          fluidRow(

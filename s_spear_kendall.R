@@ -31,7 +31,7 @@ ordinalRank <- tabItem(tabName = 'ordRank',
                           column(
                             width = 5,
                               box(width = NULL,
-                                  tags$script(js_upload_complete), #custom js to change upload complete text
+                                  tags$script(js_upload_msg_ordinalInput), #custom js to change upload complete text
                                   fileInput(inputId = 'ordinalInput',
                                             label = 'Browse for .csv files',
                                             accept = ".csv"),
@@ -52,18 +52,12 @@ ordinalRank <- tabItem(tabName = 'ordRank',
                           )
                         ),
                         fluidRow(
+                          class = 'tabStyle',
                           column(
                             width = 5, 
                             offset = 1,
                             style = 'padding: 0px;',
-                            box(title = 'Data example', 
-                                width = NULL,
-                                tableOutput('expSpear'),
-                                actionButton(
-                                  inputId = 'spearTest',
-                                  label = 'test run',
-                                  style = 'float:right;'),
-                                style = 'text-align: center;')),
+                            uiOutput('ui_spear')),
                           column(
                             width = 5,
                             fluidRow(class = 'style_valuebox_SPEAR_cyan',
@@ -110,109 +104,135 @@ ordinalRankOut <- function(input, output, data, method) {
   
   test <- ordinals(data, method)
   
-  if(method != 'tauC' & method != 'tauIntra') {
-    
-    stat <- round(as.numeric(test$statistic), 3)
-    df <- test$parameter
-    p <- round(as.numeric(test$p.value), 3)
-    rhoTau <- round(as.numeric(test$estimate), 3)
-    W <- round(as.numeric(test$value), 3)
-    
-  } else if (method != 'tauIntra') {
-    
-    tauC <- round(test[1], 3)
-    taucLower <- round(test[2], 3)
-    taucUpper <- round(test[3], 3)
-    
-  } else if (method == 'tauIntra') {
-    
-    tau <- if(!is.null(test$tauIn)) {
-      round(test$tauIn, 3)
-    } else {
-      NULL
-    }
-    p <- if(!is.null(test$p.value)) {
-      round(test$p.value, 3)
-    } else {
-      NULL
-    }
-  }
+  l_rank <<- lapply(test, as.data.frame)
   
-  output$ord1 <- renderValueBox({
+  tryCatch({
     
-    valueBox(
-      value = h4(
-        if(method == 'spearman') {
-        "Spearman's Rank Correlation Coefficient Rho"
-        }
-        else if(method == 'kendW') {
-          "Kendall's Concordance Correlation Coefficient W"
-        } 
-        else if (method == 'tauB') {
-          "Kendall's Tau B"
-        } 
-        else if( method == 'tauC') {
-          "Kendall's Tau C"
-        } else {
-          "Intraclass Tau"
-        },
-      style = 'text-align: center;
+    if(method != 'tauC' & method != 'tauIntra') {
+      
+      stat <- round(as.numeric(test$statistic), 3)
+      df <- test$parameter
+      p <- round(as.numeric(test$p.value), 3)
+      rhoTau <- round(as.numeric(test$estimate), 3)
+      W <- round(as.numeric(test$value), 3)
+      
+    } else if (method != 'tauIntra') {
+      
+      tauC <- round(test[1], 3)
+      taucLower <- round(test[2], 3)
+      taucUpper <- round(test[3], 3)
+      
+    } else if (method == 'tauIntra') {
+      
+      tau <- if(!is.null(test$tauIn)) {
+        round(test$tauIn, 3)
+      } else {
+        NULL
+      }
+      p <- if(!is.null(test$p.value)) {
+        round(test$p.value, 3)
+      } else {
+        NULL
+      }
+    }
+    
+    output$ord1 <- renderValueBox({
+      
+      tryCatch({
+        valueBox(
+          value = h4(
+            if(method == 'spearman') {
+              "Spearman's Rank Correlation Coefficient Rho"
+            }
+            else if(method == 'kendW') {
+              "Kendall's Concordance Correlation Coefficient W"
+            } 
+            else if (method == 'tauB') {
+              "Kendall's Tau B"
+            } 
+            else if( method == 'tauC') {
+              "Kendall's Tau C"
+            } else {
+              "Intraclass Tau"
+            },
+            style = 'text-align: center;
               padding-top: 10px;
               font-size: 25px;'),
-      
-      subtitle = 
-        p(
-          HTML(
-            paste0(
-              if(method == 'spearman') {
-                paste0('Rho: ', rhoTau)
-              } 
-              else if (method == 'kendW') {
-                paste0('W: ', W)
-              }
-              else if(method == 'tauB') {
-                paste0('Tau (A, B): ', rhoTau)
-              }
-              else if(method == 'tauC') {
-                paste0('TauC: ', tauC)
-              } 
-              else if(method == 'tauIntra') {
-                paste0('Tau', tags$sub('int'), ' : ', tau)
-              },
-              if(!is.null(df) & method != 'tauC' & method != 'tauIntra') {
-                paste0(br(),'df: ', df)
-              },
-              if(method != 'tauC' & !is.null(p)) {
-                if(method == 'tauIntra' & check) {
-                  ''
-                } else {
-                  paste0(br(),
-                         'p-value: ',
-                         if(p < 0.001) {
-                           '< 0.001'
-                         } else {p})
-                }
-              } 
-              else if (method == 'tauC') {
-                paste0(br(),
-                       'lower CI: ', taucLower, br(),
-                       'upper CI: ', taucUpper)
-              },
-              '&emsp;', #inserting a tab (4 spaces)
-              if(check & method != 'tauC' & method != 'tauIntra' & 
-                 method != 'kendW') {
-                circleButton(inputId = 'spear_p_value',
-                             icon = icon("exclamation"),
-                             size = 'xs')
-              },
-              if(method != 'tauC' & method != 'tauIntra') {
-                paste0(br(),'test statistic: ', stat)
-              }
-            )
-          ),
-          style = 'text-align: left;
+          
+          subtitle = 
+            p(
+              HTML(
+                paste0(
+                  if(method == 'spearman') {
+                    paste0('Rho: ', rhoTau)
+                  } 
+                  else if (method == 'kendW') {
+                    paste0('W: ', W)
+                  }
+                  else if(method == 'tauB') {
+                    paste0('Tau (A, B): ', rhoTau)
+                  }
+                  else if(method == 'tauC') {
+                    paste0('TauC: ', tauC)
+                  } 
+                  else if(method == 'tauIntra') {
+                    paste0('Tau', tags$sub('int'), ' : ', tau)
+                  },
+                  if(!is.null(df) & method != 'tauC' & method != 'tauIntra') {
+                    paste0(br(),'df: ', df)
+                  },
+                  if(method != 'tauC' & !is.null(p)) {
+                    if(method == 'tauIntra' & check) {
+                      ''
+                    } else {
+                      paste0(br(),
+                             'p-value: ',
+                             if(p < 0.001) {
+                               '< 0.001'
+                             } else {p})
+                    }
+                  } 
+                  else if (method == 'tauC') {
+                    paste0(br(),
+                           'lower CI: ', taucLower, br(),
+                           'upper CI: ', taucUpper)
+                  },
+                  '&emsp;', #inserting a tab (4 spaces)
+                  if(check & method != 'tauC' & method != 'tauIntra' & 
+                     method != 'kendW') {
+                    circleButton(inputId = 'spear_p_value',
+                                 icon = icon("exclamation"),
+                                 size = 'xs')
+                  },
+                  if(method != 'tauC' & method != 'tauIntra') {
+                    paste0(br(),'test statistic: ', stat)
+                  }
+                )
+              ),
+              div(
+                downloadButton(outputId = 'rankFullDown',
+                               label = 'Full Results'),
+                style = 'text-align: center;'
+              ),
+              style = 'text-align: left;
                   font-size: 25px;')
-    )
+        )
+      }, error = function(e) {
+        print(e)
+        ordErrOut(output)
+        
+      }, warning = function(w) {
+        print(w)
+        ordErrOut(output)
+      })
+    })
+  }, error = function(e) {
+    print(e)
+    ordErrOut(output)
+    
+  }, warning = function(w) {
+    print(w)
+    ordErrOut(output)
   })
   
 }

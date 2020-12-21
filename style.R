@@ -48,6 +48,7 @@ tabCol <- tags$style(HTML(
     }"
 ))
 
+
 mainCol <- function(input, output) {
   
   output$dark <- renderUI({
@@ -134,7 +135,7 @@ btn_hover <- function(input, output) {
   })
 }
 
-js_upload_complete <- "
+js_upload_msg_ordinalInput <- "
 Shiny.addCustomMessageHandler('upload_msg', function(msg) {
   var target = $('#ordinalInput_progress').children()[0];
   target.innerHTML = msg;

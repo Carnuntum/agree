@@ -2,62 +2,67 @@
 #'*----------------------------- CHI TABITEM ----------------------------------*
 #-------------------------------------------------------------------------------
 
-chi <- tabItem(useShinyjs(), tabName = 'chi',
+chi <- tabItem(tabName = 'chi', 
+               useShinyjs(), 
                fluidRow(
-                 style = 'text-align: center; padding: 30px;',
-                 h3('Chi-square Test for 2 Dimensional Contingency Tables')
+                 column(
+                   width = 10,
+                   offset = 1,
+                   style = 'padding-left: 0px; padding-right: -5px;',
+                   box(
+                     width = NULL,
+                     style = 'text-align:center; padding: 30px;',
+                     h3("Chi Square Test")
+                   )
+                )
                ),
                fluidRow(class = 'chiFileInput',
-                 column(
-                   width = 5, 
-                   offset = 1,
-                   box(width=NULL,
-                       height = '100px',
-                       h5('On the right side you can \
-                         upload your 2 by 2 contingency data \
-                         via a .csv file.'),
-                       h5('The file has to have the \
-                         following structure:'))),
+                        column(
+                          width = 5,
+                          offset = 1,
+                          fluidRow(
+                            box(
+                              width = NULL,
+                              height = '105px',
+                              p(file_upload_text),
+                              style = 'text-align: center;'
+                            )
+                          ),
+                          fluidRow(
+                            box(
+                              width = NULL,
+                              height = '105px',
+                              p(file_struct_text),
+                              look_down,
+                              style = 'text-align: center;'
+                            )
+                          )
+                        ),
                  column(
                    width = 5,
-                   box(width = NULL, height = '100px',
+                   box(width = NULL,
                        fileInput(inputId = 'chiInput',
-                                 label = 'Browse for .csv files')))
+                                 label = 'Browse for .csv files'),
+                       actionButton(inputId = 'chiRun',
+                                    label = 'calculate')),
+                   style = 'text-align: center;')
                ),
                fluidRow(
+                 class = 'tabStyle',
                  column(
                    width = 5, 
                    offset = 1,
-                   box(title = 'Data example', 
-                       width = NULL, 
-                       height = '250px',
-                       tableOutput('expChi'),
-                       actionButton(
-                         inputId = 'chiTest',
-                         label = 'test run',
-                         style = 'float:right;'))),
+                   style = 'padding: 0px;',
+                   uiOutput('ui_chi')
+                   ),
                  column(
                    width = 5,
-                   fluidRow(class = 'style_valuebox_OrdRank_cyan',
+                   fluidRow(class = 'style_valuebox_CHI_cyan',
                             column(
                               width = 12,
                               style = 'text-align: center;',
                               valueBoxOutput(
-                                outputId = 'chiCor',
-                                width = NULL))),
-                   fluidRow(class = 'style_valuebox_OrdRank_cyan',
-                            column(
-                              width = 12, 
-                              style = 'text-align: center;',
-                              valueBoxOutput(
-                                outputId = 'chiUncor',
-                                width = NULL))),
-                   fluidRow(class = 'style_valuebox_OrdRank_cyan',
-                            column(
-                              width = 12,
-                              style = 'text-align: center;',
-                              valueBoxOutput(
-                                outputId = 'contingencyCoeff',
+                                outputId = 'chi1',
                                 width = NULL)))
                    
                  )
@@ -109,79 +114,60 @@ chi <- tabItem(useShinyjs(), tabName = 'chi',
 #chi output for corrected test
 chiOut <- function(input, output, data) {
   
-  test <- chisq.test(data)
-  chiValue <- test$statistic
-  p <- test$p.value
-  par <- test$parameter
-  coeffC <- ContCoef(data)
-  
-  output$chiCor <- renderValueBox({
-    valueBox(
-      value = p(HTML(
-        paste0(
-          'X',
-          tags$sup('2'),' = ',
-          round(as.numeric(chiValue), 3),
-          '<br/>',
-          'df = ',
-          par,
-          '<br/>',
-          if (round(p, 3) == 0) {
-            'p < 0.001'
-          }
-          else {
-            paste('p = ', round(p, 3))
-          }
-        )
-      ),
-      style = 'font-size: 50%; text-align:center;'),
-      p('corrected', style = 'text-align:center;')
-    )
-  })
-  
-  #chi output for uncorrected test
-  output$chiUncor <- renderValueBox({
-    test <- chisq.test(data, correct = F)
+  tryCatch({
+    test_uncorr <- chisq.test(data, correct = F)
+    test_corr <- chisq.test(data, correct = T)
+    chi_uncorr_val <- test_uncorr$statistic
+    chi_corr_val <- test_corr$statistic
+    chi_uncorr_p <- test_uncorr$p.value
+    chi_corr_p <- test_corr$p.value
+    chi_uncorr_par <- test_uncorr$parameter
+    chi_corr_par <- test_corr$parameter
+    coeffC <- DescTools::ContCoef(data)
     
-    valueBox(
-      value = p(HTML(
-        paste0(
-          'X',
-          tags$sup('2'),' = ',
-          round(as.numeric(test$statistic), 3),
-          '<br/>',
-          'df = ',
-          test$parameter,
-          '<br/>',
-          if (round(test$p.value, 3) == 0) {
-            'p < 0.001'
-          }
-          else {
-            paste('p = ', round(test$p.value, 3))
-          }
-        )
-      ),
-      style = 'font-size: 50%; text-align:center;'),
-      p('uncorrected', style = 'text-align:center;')
+    d_chi <- t(
+      data.frame(
+        chi_uncorrected = chi_uncorr_val,
+        chi_uncorrected_df = chi_uncorr_par,
+        chi_uncorrected_p = chi_uncorr_p,
+        chi_corrected = chi_corr_val,
+        chi_corrected_df = chi_corr_par,
+        chi_corrected_p = chi_corr_p,
+        contingency_coeff = coeffC
+      )
     )
+    
+    l_chi <<- as.list(d_chi)
+    
+    output$chi1 <- renderValueBox({
+      tryCatch({
+        valueBox(
+          value = p(HTML(
+            kableExtra::kable(round(d_chi, 3), format = 'html') %>% 
+              kableExtra::kable_styling('basic'),
+            
+          ),
+          div(
+            downloadButton(outputId = 'chiFullDown',
+                           label = 'Full Results'),
+            style = 'text-align: center;'
+          )),
+          subtitle = ''
+        )
+      }, error = function(e) {
+        print(e)
+      }, warning = function(w) {
+        print(w)
+        invalid_data(output, 'chi1')
+      })
+    })
+    
+  }, error = function(e) {
+    print(e)
+  }, warning = function(w) {
+    print(w)
   })
   
-  output$contingencyCoeff <- renderValueBox({
-    
-    valueBox(
-      value = p(HTML(
-        paste0(
-          'Contingency Coefficient',
-          ' = ',
-          round(as.numeric(coeffC), 3),
-          '<br/>'
-        )
-      ),
-      style = 'font-size: 50%; text-align:center;
-               margin-top: 30px;'),
-      subtitle =  p('') #here may come Cmax <- need number of categories in dataset
-    )
-  })
 }
 
 
