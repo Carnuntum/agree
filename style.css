@@ -15,6 +15,10 @@ h3 {color:black;}
 
 .chiRow1 {height:300px;}
 
+.popover {
+  max-width: 100%;
+}
+
 /*give a fluidrow a custom class like 'class = something' to refer to elements
 in just that row*/
 /*.chiValueBox1 .small-box {height: 115px;}
@@ -25,14 +29,41 @@ in just that row*/
 /*.style_valuebox_PA1 .box.box {
   background: #309CCC;
 }*/
-.style_valuebox_CHI_cyan .small-box {
+/*.style_valuebox_OUTPUT_cyan .small-box {
   background-color: #3c8dbc !important;
   box-shadow: none;
-  color: white;
 }
 
-.style_valuebox_CHI_cyan .table {
+.style_valuebox_OUTPUT_cyan .table {
   color: white;
+  font-size: 12px;
+}*/
+
+.style_valuebox_OUTPUT_cyan .small-box {
+  background-color: #3c8dbc !important;
+  color: white ;
+  box-shadow: none;
+}
+
+.style_valuebox_OUTPUT_cyan .table {
+  color: white;
+  font-size: 12px;
+}
+
+.style_valuebox_OUTPUT_cyan tr:hover {
+  background-color: #51BFFF !important;
+}
+
+
+
+.style_valuebox_PI_cyan .small-box {
+  background-color: #3c8dbc !important;
+  box-shadow: none;
+  color: white !important;
+}
+
+.style_valuebox_PI_cyan .table {
+  color: white !important;
   font-size: 12px;
 }
 
@@ -41,17 +72,17 @@ in just that row*/
   box-shadow: none;
 }
 
-.style_valuebox_KAPPA_cyan .small-box {
+.style_valuebox_COHEN_cyan .small-box {
   background-color: #3c8dbc !important;
   box-shadow: none;
 }
 
-.style_valuebox_PA_cyan .small-box {
+.style_valuebox_COHEN_cyan .small-box {
   background-color: #3c8dbc !important;
   box-shadow: none;
 }
 
-.style_valuebox_PA_cyan .table {
+.style_valuebox_COHEN_cyan .table {
   color: white;
   font-size: 12px;
 }
@@ -217,13 +248,13 @@ changes all valueboxes, not really wanted
   border-right-color: black;
 }
 
-.chiFileInput .btn-file {
+.piFileInput .btn-file {
   padding-top: 7px;
   padding-bottom: 7px;
 }
 
 .documRow {
-  padding-top: 30px;
+  padding-top: 5px;
 }
 
 .homeDocumBtns .action-button.shiny-bound-input {
@@ -294,29 +325,29 @@ changes all valueboxes, not really wanted
   color: white;
 }
 
-.omegaSelect .selectize-input {
+.selectInputStyle .selectize-input {
   background-color: #3c8dbc;
   color: white;
   border: none;
 }
 
-.omegaSelect .selectize-dropdown {
+.selectInputStyle .selectize-dropdown {
   background-color: #3c8dbc;
   color: white;
   border: none;
 }
 
-.omegaSelect .selectize-dropdown-content .active {
+.selectInputStyle .selectize-dropdown-content .active {
   background-color: lightgreen;
   color: black;
   border: none;
 }
 
-.omegaSelect .selectize-control.single .selectize-input.input-active {
+.selectInputStyle .selectize-control.single .selectize-input.input-active {
   background: #3c8dbc;
 }
 
-.omegaSelect .optgroup-header {
+.selectInputStyle .optgroup-header {
   background-color: white;
   color: black;
   border: none;

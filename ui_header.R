@@ -29,8 +29,18 @@ header <- dashboardHeader(title = 'Agreement Measures',
                                                             margin-top: 10px;
                                                             height: 30px;
                                                             font-size: 15px;'),
+                                               
+                                               actionButton(inputId = 'backToDecTree',
+                                                            label = 'Choosing Measure',
+                                                            width = '140px',
+                                                            style = '
+                                                            margin-top: 10px;
+                                                            height: 30px;
+                                                            font-size: 15px;'),
                                                right = T,
                                                status = 'settBtn'
                                   
-                                  )))
+                                  )
+                                )
+                          )
 

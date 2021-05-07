@@ -8,10 +8,10 @@ krippendorf <- tabItem(tabName = 'krippendorf',
                      offset = 1,
                      style = 'padding-left: 0px; padding-right: -5px;',
                      box(
+                       id = 'krippDocum',
                        width = NULL,
-                       style = 'text-align:center; padding: 30px;',
-                       h3(id = 'krippDocum',
-                          "Krippendorf's Alpha")
+                       style = 'text-align:center; padding: 0;',
+                       h3("Krippendorf's Alpha")
                      ),
                      hidden(
                        div(id = 'krippDocumBox',
@@ -19,7 +19,8 @@ krippendorf <- tabItem(tabName = 'krippendorf',
                                     column(width = 12,
                                            offset = 0,
                                            box(title = kripp_docum_text,
-                                               width = NULL)
+                                               width = NULL,
+                                               style = 'text-align:center; padding: 0;')
                                     )
                            )
                        )
@@ -88,9 +89,14 @@ krippendorf <- tabItem(tabName = 'krippendorf',
                             fluidRow(class = 'style_valuebox_KRIPP_cyan',
                                      column(
                                        width = 12,
-                                         valueBoxOutput(
-                                           outputId = 'kripp1',
-                                           width = NULL)
+                                       shinyBS::popify(valueBoxOutput(outputId = 'kripp1', width = NULL), 
+                                                       title = 'What means what',
+                                                       content = paste0('<li>', names(kripp1_output_description),
+                                                                        ' = ',
+                                                                        as.character(kripp1_output_description), '</li>',
+                                                                        br()),
+                                                       placement = 'left'
+                                       )
                                      )
                             )
                           )
@@ -101,9 +107,22 @@ krippMainOut <- function(input, output, data) {
   
   tryCatch({
     
-    test <- krippMain(input, output, data)
-    alpha <- test$value
+    test <- warning_handler(krippMain(input, output, data))
+    alpha <- test$alpha.hat
+    
+    test$call <- NULL
+    test$dist <- NULL
+    
     l_kripp <<- lapply(test, as.data.frame)
+    
+    d_kripp <- data.frame('est.kripp' = alpha)
+    
+    ci <- confint(test, 0.95)
+    
+    d_kripp$lb <- ci[1]
+    d_kripp$ub <- ci[2]
+    
+    d_kripp <- t(d_kripp)
     
   }, error = function(e) {
     print(e)
@@ -115,12 +134,27 @@ krippMainOut <- function(input, output, data) {
     tryCatch({
       
       valueBox(
-        subtitle = p(HTML(paste0(
-          'Alpha: ', round(as.numeric(alpha), 3), br(),br(),
+        subtitle = p(HTML(
+          kableExtra::kable(d_kripp, format = 'html') %>% 
+            kableExtra::kable_styling('basic'),
+          
+        ),
+        div(
+          if(!is.null(msg)) {
+            p(HTML(paste0(
+              circleButton(inputId = 'warningButton',
+                           icon = icon("exclamation"),
+                           size = 's'),
+              br()
+            )))
+          },
+          style = centerText
+        ),
+        div(
           downloadButton(outputId = 'krippFullDown',
-                         label = 'Full Results')
+                         label = 'Full Results'),
+          style = centerText
         )),
-        style = 'text-align: center; font-size: 20px;'),
         value = ''
       )
       
@@ -132,4 +166,9 @@ krippMainOut <- function(input, output, data) {
     })
     
   })
+}
+
+bfun_kripp <- function(d,i) {
+  dat <- t(d[i,])
+  return(irr::kripp.alpha(dat, choice))
 }

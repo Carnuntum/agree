@@ -1,13 +1,25 @@
 #-------------------------------------------------------------------------------
 #'*------------------------- ERROR MESSAGES FOR USER --------------------------*
 #-------------------------------------------------------------------------------
+kableError <- data.frame(
+  "invalid data" = "check your data carefully"
+)
+
 warning_handler <- function(expr) {
   msg <<- list()
   withCallingHandlers(expr,
                       warning = function(w) {
                         msg <<- append(msg, conditionMessage(w))
+                        print(paste('warning_handler warning: ', msg))
                         invokeRestart("muffleWarning")
+                      },
+                      error = function(e) {
+                        msg <<- append(msg, conditionMessage(e))
+                        print(paste('warning_handler error: ', msg))
                       })
+  if(length(msg) == 0) {
+    msg <<- NULL
+  }
   return(expr)
 }
 
@@ -82,7 +94,7 @@ spear_no_exact_p <- function() {
     div(class = 'modaldiag',
         modalDialog(
                   title = 'Warning!',
-                  'Exact p-value cannot be calculated with ties in dataset!',
+                  msg,
                   easyClose = T,
                   style = 'text-align: center;'
       )
@@ -197,27 +209,52 @@ moreOmegaInfo <- function() {
 
 
 modal_warn_out <- function(warn_msg) {
+  l <- list()
   out <- list()
   for(i in seq_along(warn_msg)) {
-    out[i] <- paste0(i, ": {", warn_msg[i], "}")
+    l[i] <- paste0(i, ": {", warn_msg[i], "}")
   }
-  for(i in seq_along(out)) {
+  
+  for(i in seq_along(l)) {
+    if(i %% 2 != 0) {
+      out <- append(out, l[i])
+    }
     if(i %% 2 == 0) {
-      out <- rlist::list.insert(out, i, br())
-      out <- rlist::list.insert(out, i, br())
+      out <- rlist::list.append(out, br())
+      out <- rlist::list.append(out, br())
+      out <- rlist::list.append(out, l[i])
+      out <- rlist::list.append(out, br())
+      out <- rlist::list.append(out, br())
     }
   }
-  return(out)
+  
+  showModal(
+    div(class = 'modaldiag',
+        modalDialog(
+          title = 'Warning!',
+          div(out),
+          easyClose = T,
+          style = centerText
+        )
+    )
+  )
 }
 
 invalid_data <- function(output, out_id) {
-  output[["out_id"]] <- renderValueBox({
+  output[[out_id]] <- renderValueBox({
     valueBox(
-      value = h4("Invalid Data!",
-                 style = 'text-align: center;
-                         padding-top: 10px;
-                         font-size: 25px;'),
-      subtitle = ''
+      value = p(HTML(paste0(
+        h4("Ups..something wrong happened!",
+        style = 'text-align: center;
+                padding-top: 10px;
+                font-size: 25px;')
+        ))),
+      subtitle = div(class = 'warningButtonClass',
+        p(HTML(paste(
+        circleButton(inputId = 'warningButton',
+                     icon = icon("exclamation"),
+                     size = 's')
+      ))), style = 'text-align:center;')
     )
   })
 }

@@ -6,6 +6,7 @@ source('ui_sidebarMenuItems.R')
 sidebar <- dashboardSidebar(
   sidebarMenu(id = 'dbSidebar',
     docMenu,
+    gettingStarted,
     allMethods
   )
 )

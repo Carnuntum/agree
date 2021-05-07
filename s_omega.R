@@ -6,6 +6,7 @@ lvlInterval <- list('NONE',
 lvlRatio <- list('BETA',
                   'KUMARASWAMY')
 
+
 omega <- tabItem(tabName = 'omega',
                useShinyjs(),
                fluidRow(
@@ -15,7 +16,7 @@ omega <- tabItem(tabName = 'omega',
                    style = 'padding-left: 0px; padding-right: -5px;',
                    box(
                      width = NULL,
-                     style = 'text-align:center; padding: 30px;',
+                     style = measure_title_style,
                      h3("Sklars Omega")
                    )
                  )
@@ -67,7 +68,7 @@ omega <- tabItem(tabName = 'omega',
                                                 size = 'n',
                                                 choices = c('none', 'bootstrap', 'asymptotic'),
                                                 direction = 'horizontal'),
-                           div(class = 'omegaSelect',
+                           div(class = 'selectInputStyle',
                                selectInput(inputId = 'omegaChoices2',
                                            label = 'Distribution',
                                            choices = list(`Interval Scale` = 
@@ -92,7 +93,7 @@ omega <- tabItem(tabName = 'omega',
                         ),
                         column(
                           width = 5,
-                          fluidRow(class = 'style_valuebox_OMEGA_cyan',
+                          fluidRow(class = 'style_valuebox_OUTPUT_cyan',
                                    column(
                                      width = 12,
                                      shinycssloaders::withSpinner(
@@ -154,6 +155,7 @@ omegaMainOut <- function(input, output, data) {
               'n of marginal parameters: ', np, br(),
               'total parameters: ', n, br(),
               'value: ', val, br(),
+              'warnings: ', if(exists("globalOmegaWarn")) {globalOmegaWarn}, br(),
               br(),
               div(
                 downloadButton(outputId = 'omegaResDown',

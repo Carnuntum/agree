@@ -141,3 +141,7 @@ Shiny.addCustomMessageHandler('upload_msg', function(msg) {
   target.innerHTML = msg;
 });
 "
+
+measure_title_style <- 'text-align: center; padding: 0;'
+
+centerText <- 'text-align: center;'

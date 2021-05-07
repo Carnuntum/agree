@@ -1,5 +1,4 @@
 
-
 icc <- tabItem(tabName = 'icc',
                useShinyjs(),
                     fluidRow(
@@ -52,13 +51,6 @@ icc <- tabItem(tabName = 'icc',
                                                      size = 'n',
                                                      choices = c('oneway', 'twoway'),
                                                      direction = 'horizontal'),
-                                checkboxGroupButtons(inputId = 'iccChoices1',
-                                                     status = 'iccbtn2',
-                                                     justified = T,
-                                                     individual = F,
-                                                     size = 'n',
-                                                     choices = c('consistency', 'agreement'),
-                                                     direction = 'horizontal'),
                                 checkboxGroupButtons(inputId = 'iccChoices2',
                                                      status = 'iccbtn3',
                                                      justified = T,
@@ -95,7 +87,6 @@ icc <- tabItem(tabName = 'icc',
 iccMainOut <- function(input, output, data, test = F) {
   
   test <- iccMain(input, output, data, test)
-  
   
   tryCatch({
     

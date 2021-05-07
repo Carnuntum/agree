@@ -1,22 +1,10 @@
-xmp_chi <- data.frame(athletes = c(273,266),
-                          students = c(10218,14081),
-                          row.names = c('male','female'))
+
 
 xmp_odds <- matrix(data = c(c(19,10),
                            c(8,21)),
                   ncol = 2,
                   dimnames = list(c(1,0), c(1,0)))
 
-
-exactTest <- function(data) {
-  
-  for(i in 1:nrow(data)) {
-    for(j in 1:ncol(data)) {
-      if(data[i,j] <= 5) return(T)
-    }
-  }
-  return(F)
-}
 
 xmp_pa <- matrix(data = c(c(2,2,3,3,4,6,8),
                                    c(2,3,4,3,4,6,8)), ncol = 2,
@@ -49,9 +37,9 @@ p_table <- read.csv2('example_data/tauIntra_p_table.csv')
 
 xmp_poly1 <- as.table(matrix(c(23,45,23,67,45,78,45,12,78), 3, 3))
 
-xmp_poly2 <- round(abs(data.frame('rater1' = rnorm(7, 3, 0.5),
-                              'rater2' = rnorm(7,3, 0.5),
-                              'rater3' = rnorm(7, 3, 0.5))))
+xmp_poly2 <- round(abs(data.frame('rater1' = c(3,3,3,3,3,3,4),
+                              'rater2' = c(2,3,3,4,3,3,3),
+                              'rater3' = c(3,3,3,3,3,2,3))))
 
 xmp_icc <- round(abs(data.frame('rater1' = rnorm(6, 4, 1.5),
                                'rater2' = rnorm(6, 4, 1.5),
@@ -63,10 +51,10 @@ xmp_omega <- matrix(c(1,2,3,3,2,1,4,1,2,NA,NA,NA,
                      1,2,3,3,2,4,4,1,2,5,1,NA), 12, 4)
 colnames(xmp_omega) = c("c.1.1", "c.2.1", "c.3.1", "c.4.1")
 
-xmp_kripp <- matrix(c(1,1,NA,1,2,2,3,2,3,3,3,3,3,3,3,3,2,2,2,2,1,2,3,4,4,4,4,4,
-                     1,1,2,1,2,2,2,2,NA,5,5,5,NA,NA,1,1,NA,NA,3,NA),nrow=4)
+xmp_kripp <- t(matrix(c(1,1,NA,1,2,2,3,2,3,3,3,3,3,3,3,3,2,2,2,2,1,2,3,4,4,4,4,4,
+                     1,1,2,1,2,2,2,2,NA,5,5,5,NA,NA,1,1,NA,NA,3,NA),nrow=4))
 
-colnames(xmp_kripp) <- paste0('r', 1:12)
+colnames(xmp_kripp) <- paste0('r', 1:4)
 
 set.seed(seed = 1234)
 xmp_ccc <- data.frame('m1' = as.numeric(rnorm(n = 100, mean = 0, sd = 1)),
@@ -74,11 +62,15 @@ xmp_ccc <- data.frame('m1' = as.numeric(rnorm(n = 100, mean = 0, sd = 1)),
                                runif(n = 100, min = 0, max = 1)))
 
 
-l <- list(xmp_chi, xmp_odds, xmp_pa, xmp_pn, xmp_kappa, xmp_spear,
-      xmp_poly1, xmp_poly2, xmp_icc, xmp_omega, xmp_kripp, xmp_ccc)
+# l <- list(xmp_chi, xmp_odds, xmp_pa, xmp_pn, xmp_kappa, xmp_spear,
+#       xmp_poly1, xmp_poly2, xmp_icc, xmp_omega, xmp_kripp, xmp_ccc)
+# 
+# xmp_l <<- list()
+# for(i in 1:12) {
+#   xmp_l[[paste0(i)]] <- l[[i]]
+# }
 
-xmp_l <<- list()
-for(i in 1:12) {
-  xmp_l[[paste0(i)]] <- l[[i]]
-}
 
+xmp_rwg <- data.frame('group' = c(1,1,1))
+xmp_rwg <- cbind(xmp_rwg, t(xmp_poly2)[,1:5])
+colnames(xmp_rwg) <- c('group', paste0('item', seq(1, (ncol(xmp_rwg) - 1))))

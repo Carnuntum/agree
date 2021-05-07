@@ -1,0 +1,13 @@
+name: agreement
+title: agreement
+username:
+account: agree
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4083514
+bundleId: 4569981
+url: https://agree.shinyapps.io/agreement/
+when: 1620392943.83721
+lastSyncTime: 1620392943.83721
+asMultiple: FALSE
+asStatic: FALSE
