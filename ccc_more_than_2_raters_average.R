@@ -448,7 +448,15 @@ sCoefficientCPP <- function(ratings, categories) {
 }
 
 t1 <- Sys.time()
-boot::boot(landis, bfunCPP, R = 2000)
+for(i in 1:1000) {
+  a <- sCoefficientCPP(landis, 5)
+}
+Sys.time() - t1
+
+t1 <- Sys.time()
+for(i in 1:1000) {
+  a <- irrCAC::bp.coeff.raw(landis, weights = 'linear')
+}
 Sys.time() - t1
 
 #rcpp version
@@ -753,3 +761,116 @@ ownBoot <- function(n, data) {
   ddl <- lapply(output(n, data), as.data.frame)
   return(lapply(ddl, bfun))
 }
+
+
+
+####################### van oest kappa ########################################
+agr <- function(ratings) {
+  ratings <- as.matrix(na.omit(ratings))
+  ns <- nrow(ratings)
+  nr <- ncol(ratings)
+  lev <- levels(as.factor(ratings))
+  
+  
+  # itemsByCategory <- t(apply(ratings, 1, FUN = function(row) {
+  #   as.numeric(table(factor(row, lev)))
+  # }))
+  
+  ratersByCategory <- t(apply(ratings, 2, FUN = function(row) {
+    as.numeric(table(factor(row, lev)))
+  }))
+  
+  # itemsByCategory <- matrix(itemsByCategory, nrow = ns)
+  # ratersByCategory <- matrix(ratersByCategory, nrow = nr)
+  agreeP <- pa(ratings)
+  
+  return(list('Pa' = agreeP$pa, 'itemsByCat' = agreeP$agreeMat, 'ratersByCat' = ratersByCategory))
+}
+
+rm(a)
+t1 <- Sys.time()
+for(i in 1:1000) {
+  a <- agr(landis)
+}
+print(Sys.time() - t1)
+
+
+
+data(landis)
+test <- data.frame(landis[,1], landis[,2])
+
+# mat <- agr_col(test)[[2]]
+# 
+# cols <- colSums(mat)
+# cols <- cols / (2 * 118)
+# cols <- cols^2
+# sum(cols)
+
+Ir <- function(ratings) {
+  all  <- agr_col(ratings)
+  Pa <- all[[1]]
+  k <- ncol(all[[2]])
+  mat <- all[[3]]
+  r <- nrow(mat)
+  N <- nrow(ratings)
+  
+  above <- 1 + colSums(mat)
+  below <- k + (r * N)
+  
+  Pe <- sum((above / below)^2)
+  return((Pa - Pe) / (1 - Pe))
+}
+
+t1 <- Sys.time()
+for(i in 1:1000) {
+  a <- Ir(r)
+}
+print(Sys.time() - t1)
+
+bfun_Ir <- function(d, i) {
+  dat <- d[i,]
+  return(Ir(dat))
+}
+
+b <- boot::boot(ratings, bfun_Ir, 2000)
+
+
+pa <- function (ratings) {
+  ns <- nrow(ratings)
+  nr <- ncol(ratings)
+  ratings.mat <- as.matrix(ratings)
+  n <- nrow(ratings.mat)
+  r <- ncol(ratings.mat)
+  categ <- sort(unique(na.omit(as.vector(ratings.mat))))
+  q <- length(categ)
+  
+  agree.mat <- matrix(0, nrow = n, ncol = q)
+  for (k in 1:q) {
+    categ.is.k <- (ratings.mat == categ[k])
+    agree.mat[, k] <- (replace(categ.is.k, is.na(categ.is.k), FALSE)) %*% rep(1, r)
+  }
+  pa <- sum((rowSums(agree.mat^2) - nr)/(nr * (nr - 1))/ns)
+  
+  return(list('pa' = pa, 'agreeMat' = agree.mat))
+}
+
+
+
+
+
+x1 <- rbinom(100, 1, 0.8)
+x2 <- rbinom(100, 1, 0.8)
+
+y1 <- rbinom(100, 1, 0.2)
+y2 <- rbinom(100, 1, 0.2)
+
+bin1 <- as.matrix(data.frame(x1, x2))
+bin2 <- as.matrix(data.frame(y1, y2))
+hist(bin1)
+hist(bin2)
+
+addmargins(table(as.data.frame(bin1)))
+addmargins(table(as.data.frame(bin2)))
+
+
+

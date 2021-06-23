@@ -63,21 +63,27 @@ allMethods <- menuItem(text = 'Methods',
                        #FREE KAPPA CARPENTIER
                        menuItem(text = "Carpentier's Kappa", tabName = 'kappa_free'),
                        
+                       #OEST KAPPA
+                       menuItem(text = "van Oest's Kappa", tabName = 'kappa_oest'),
+                       
                        #INFORMATION AGREEMENT
                        menuItem(text = "Information Agreement", tabName = 'other_infoAgree'),
                        
-                      #replace
+                      #ICC
                       menuItem(text = 'Intraclass Correlation',
-                               tabName = 'icc'),
+                               tabName = 'other_icc'),
                       
-                      #replace
+                      #SKLARS OMEGA
                       menuItem(text = "Sklars Omega",
-                               tabName = 'omega'),
+                               tabName = 'other_omega'),
                       
-                      #replace
+                      #KRIPP ALPHA
                       menuItem(text = "Krippendorfs's Alpha",
-                               tabName = 'krippendorf'),
+                               tabName = 'other_kripp'),
                       
-                      #replace
+                      #OCCC
                       menuItem(text = 'Concordance Correlation Coeff.',
                                tabName = 'other_occc'))
+
+
+references <- menuItem(text = 'References', tabName = 'refs')

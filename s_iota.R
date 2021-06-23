@@ -1,100 +1,101 @@
 
 other_iota <- tabItem(
   tabName = 'other_iota',
-  fluidRow(
     fluidRow(column(width = 10, 
                   offset = 1,
-                  style = 'padding-left: 0px; padding-right: -5px;',
+                  style = 'padding-left: 0px;',
                   box(
                     id = 'iotaDocum',
-                    width = 12,
+                    width = NULL,
                     style = measure_title_style,
                     h3("Iota")
+                  ),
+                  hidden(
+                    div(id = 'iotaDocumBox',
+                        fluidRow(class = 'documRow',
+                                 column(width = 12,
+                                        offset = 0,
+                                        box(title = iota_docum_text,
+                                            width = NULL,
+                                            style = measure_title_style)
+                                 )
+                        )
+                    )
                   )
   )),
-  hidden(
-    div(id = 'iotaDocumBox',
-        fluidRow(class = 'documRow',
-                 column(width = 10,
-                        offset = 1,
-                        style = 'padding-left: 0px; padding-right: -5px;',
-                        box(title = iota_docum_text,
-                            width = 12,
-                            style = 'text-align:center; padding: 0;')
-                 )
-        )
-    )
-  ),
-  column(
-    width = 5,
-    offset = 1,
-    fluidRow(box(
-      width = NULL,
-      height = '105px',
-      p(file_upload_text),
-      style = centerText
-    )),
-    fluidRow(
-      box(
+  fluidRow(
+    
+    column(
+      width = 5,
+      offset = 1,
+      fluidRow(box(
         width = NULL,
         height = '105px',
-        p(file_struct_text),
-        look_down,
+        p(file_upload_text),
         style = centerText
-      )
-    ),
-    fluidRow(column(
-      class = 'tabStyle',
-      width = 12,
-      offset = 0,
-      style = 'padding: 0px;',
-      uiOutput('ui_iota')
-    ))),
-  column(
-    width = 5,
-    box(
-      width = NULL,
-      fileInput(inputId = 'iotaInput',
-                label = 'Browse for .csv files'),
-      h5('Number of rated variables'),
-      numericInput(
-        inputId = 'iotaNumInput',
-        value = 1,
-        label = '',
-        min = 1
-      ),
-      h5('Choose weighting method'),
-      div(
-        class = 'selectInputStyle',
-        selectInput(
-          inputId = 'iota_scale',
-          label = '',
-          choices = c('quantitative',
-                      'nominal')
-        ),
-        style = centerText
-      ),
-      actionButton(inputId = 'iotaRun',
-                   label = 'calculate'),
-      style = centerText
-    ),
-    column(
-      width = 12,
+      )),
       fluidRow(
-        class = 'style_valuebox_OUTPUT_cyan',
-        
-        width = 12,
-        shinyBS::popify(valueBoxOutput(outputId = 'iota', width = NULL), 
-                        title = 'What means what',
-                        content = paste0('<li>', names(iota_output_description),
-                                         ' = ',
-                                         as.character(iota_output_description), '</li>',
-                                         br()),
-                        placement = 'left'
+        box(
+          width = NULL,
+          height = '105px',
+          p(file_struct_text),
+          look_down,
+          style = centerText
         )
-      )
+      ),
+      fluidRow(column(
+        class = 'tabStyle',
+        width = 12,
+        offset = 0,
+        style = 'padding: 0px;',
+        uiOutput('ui_iota')
+      ))),
+    column(
+      width = 5,
+      box(
+        width = NULL,
+        fileInput(inputId = 'iotaInput',
+                  label = 'Browse for .csv files'),
+        h5('Number of rated variables'),
+        numericInput(
+          inputId = 'iotaNumInput',
+          value = 1,
+          label = '',
+          min = 1
+        ),
+        h5('Choose weighting method'),
+        div(
+          class = 'selectInputStyle',
+          selectInput(
+            inputId = 'iota_scale',
+            label = '',
+            choices = c('quantitative',
+                        'nominal')
+          ),
+          style = centerText
+        ),
+        actionButton(inputId = 'iotaRun',
+                     label = 'calculate'),
+        style = centerText
+      ),
+      fluidRow(column(width = 12,
+                      shinyWidgets::dropMenu(
+                        div(id = 'iotaDrop',
+                            fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                                     column(
+                                       width = 12,
+                                       valueBoxOutput(outputId = 'iota', width = NULL)
+                                     )
+                            )
+                        ),
+                        HTML(kableExtra::kable(t(iota_output_description)) %>% 
+                               kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+                        trigger = 'mouseenter',
+                        theme = 'translucent',
+                        placement = 'left-start')
+      ))
     )
-  ))
+  )
 )
 
 
@@ -112,11 +113,10 @@ iotaOut <- function(input, output, data, scope = F) {
     numVars <<- if(ncol(data) == input$iotaNumInput) {ncol(data)} else {
       ncol(data)/input$iotaNumInput
     }
-    print(numVars)
     choice <- input$iota_scale
     
     warning_handler(if(numVars%%1 != 0) {stop('cannot create equal number of rating matrices.
-                                                           did you specifiy the correct number of variables?')})
+                                               did you specifiy the correct number of variables?')})
     
     warning_handler(if(any(dim(data) == 0)) {stop('cannot create rating matrices. too many NAs?')})
     
@@ -146,13 +146,16 @@ iotaOut <- function(input, output, data, scope = F) {
     l_iota <<- lapply(vals_iota$vals, as.data.frame)
     
     class(vals_iota$vals) <- 'list'
+    vals_iota$vals$irr.name <- NULL
     
     vals_iota$vals <- as.list(unlist(vals_iota$vals))
     
-    ci <- warning_handler(makeCi(as.data.frame(datList), bfun))
-    
-    vals_iota$vals$lb <- ci[1]
-    vals_iota$vals$ub <- ci[2]
+    if(!(vals_iota$vals$value == 'NaN')) {
+      ci <- warning_handler(makeCi(as.data.frame(datList), bfun))
+      
+      vals_iota$vals$lb <- ci[1]
+      vals_iota$vals$ub <- ci[2]
+    }
     
     d_iota <- t(as.data.frame(vals_iota$vals))
     
@@ -170,7 +173,7 @@ iotaOut <- function(input, output, data, scope = F) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_iota, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

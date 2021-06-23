@@ -77,20 +77,21 @@ other_ad <- tabItem(
       uiOutput('ui_ad')
     ),
     
-    column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'ad', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(ad_output_description),
-                                                       ' = ',
-                                                       as.character(ad_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
+      column(width = 5,
+           shinyWidgets::dropMenu(
+             div(id = 'adDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'ad', width = NULL)
+                            )
+                          )
+                 ),
+             HTML(kableExtra::kable(t(ad_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   )
 )
@@ -125,7 +126,7 @@ adOut <- function(input, output, data) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_ad, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

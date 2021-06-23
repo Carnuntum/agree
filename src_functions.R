@@ -17,18 +17,19 @@ create_tabset <- function(output,
     title = tabTitle,
     box(
       title = boxTitle,
-      width = NULL,
-      tableOutput(tableId),
-      downloadButton(
-        outputId = downId,
-        label = '',
-        style = 'float: right;'
-      ),
       actionButton(
         inputId = btnInputId,
         label = 'test run',
-        style = 'float: right;'
-      )
+        style = 'float: left;'
+      ),
+      downloadButton(
+        outputId = downId,
+        label = '',
+        style = 'float: left;'
+      ),
+      width = NULL,
+      tableOutput(tableId),
+      style = 'overflow-x: scroll; overflow-y: scroll; max-height: 600px; scrollbar-color: red;'
     )
   )
   
@@ -43,7 +44,7 @@ make_xmp_table <- function(output, out_id, data) {
   output[[out_id]] <- function() {
     tryCatch({
       kableExtra::kable(data, format = 'html') %>%
-        kableExtra::kable_styling('basic')
+        kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')
     }, error = function(e) {
       print('make_xmp_table - error')
       print(e)
@@ -163,7 +164,7 @@ ExampleTables <- function(input, output) {
   
   #VON EYE K
   set_tabset(output, out_id = 'ui_eye', id = 'id_eye', tableId = 'tab_eye', downId = 'down_eye',
-             btnInputId = 'test_eye', data = xmp_icc)
+             btnInputId = 'test_eye', data = xmp_spear)
   
   #AD INDEX
   set_tabset(output, out_id = 'ui_ad', id = 'id_ad', tableId = 'tab_ad', downId = 'down_ad',
@@ -176,6 +177,10 @@ ExampleTables <- function(input, output) {
   #FREE KAPPA
   set_tabset(output, out_id = 'ui_freeKappa', id = 'id_freeKappa', tableId = 'tab_freeKappa', downId = 'down_freeKappa',
              btnInputId = 'test_freeKappa', data = xmp_pn)
+  
+  #OEST KAPPA
+  set_tabset(output, out_id = 'ui_oest', id = 'id_oest', tableId = 'tab_oest', downId = 'down_oest',
+             btnInputId = 'test_oest', data = xmp_icc)
   
   #INFORMATION AGREEMENT
   set_tabset(output, out_id = 'ui_infoAgree', id = 'id_infoAgree', tableId = 'tab_infoAgree', downId = 'down_infoAgree',
@@ -223,7 +228,9 @@ defaultOutAll <- function(input, output) {
 #-------------------------------------------------------------------------------
 
   output$pi1 <- renderValueBox({
-      valueBox(value = h4('Output'), '')
+    valueBox(value = h4('Output',
+                        style = 'text-align: center;
+                                padding: 15px;'), '')
   })
   
 #'*----------------------------- COHEN KAPPA ----------------------------------*
@@ -368,6 +375,14 @@ output$freeKappa <- renderValueBox({
                                 padding: 15px;'), '')
 })
 
+#'*----------------------------- OEST KAPPA -----------------------------------*
+#-------------------------------------------------------------------------------
+output$oest <- renderValueBox({
+  valueBox(value = h4('Output',
+                      style = 'text-align: center;
+                                padding: 15px;'), '')
+})
+
 #'*----------------------- INFORMATION AGREEMENT ------------------------------*
 #-------------------------------------------------------------------------------
 output$infoAgree <- renderValueBox({
@@ -382,6 +397,14 @@ output$infoAgree <- renderValueBox({
     valueBox(value = h4("Output",
                         style = 'text-align: center;
                                 padding: 15px;'), '')
+  })
+
+#'*---------------------------- ENTROPY INDEX ---------------------------------*
+#-------------------------------------------------------------------------------
+  output$omega <- renderValueBox({
+    valueBox(value = h4('Output',
+                        style = 'text-align: center;
+                                  padding: 15px;'), '')
   })
   
 #'*------------------------------- KRIPP --------------------------------------*
@@ -408,6 +431,173 @@ output$infoAgree <- renderValueBox({
 #-------------------------------------------------------------------------------
 #'*--------------------- DEFAULT OUTPUT FOR ALL END ---------------------------*
 #-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+#'*------------------------------ SCOTTS PI -----------------------------------*
+#-------------------------------------------------------------------------------
+#extracted functions from removed package rel
+
+spi <- function (data = NULL, weight = c("unweighted", "linear", 
+                                         "quadratic"), conf.level = 0.95) 
+{
+  cl <- match.call()
+  na <- method <- nr <- nc <- K <- t <- zero <- NULL
+  list2env(prepd(data, "spi", weight, conf.level), envir = environment())
+  if (nc == 2) {
+    mat <- ctab(data, K, "spi", zero)
+    w <- wgts(weight, "spi", mat, K, zero)
+    wmat <- (mat/nr) * w
+    po <- sum(wmat)
+    pe <- sum(((rowSums(mat) + colSums(mat))/(nr * 2))^2 * 
+                w)
+    se <- sqrt((1/(1 - pe))^2 * (po * (1 - po))/(nr - 1))
+  }
+  else {
+    method = paste("Fleiss' kappa")
+    mat <- sapply(X = 1:K, function(x) rowSums(data == x))
+    po <- sum(mat * (mat - 1))/((nr * nc) * (nc - 1))
+    pe <- sum(colSums(mat/(nr * nc))^2)
+    pj <- colSums(mat)/(nr * nc)
+    qj <- 1 - pj
+    se <- (2/(sum(pj * qj)^2 * (nr * nc * (nc - 1))) * (sum(pj * 
+                                                              qj)^2 - sum(pj * qj * (qj - pj))))^(1/2)
+    w <- NA
+  }
+  est <- (po - pe)/(1 - pe)
+  names(est) <- "Const"
+  ub <- est + (se * t)
+  lb <- est - (se * t)
+  y <- structure(list(method = method, call = cl, obs = nc, 
+                      sample = nr, est = est, se = se, conf.level = conf.level, 
+                      lb = lb, ub = ub, mat = mat, weight = w, data = data), 
+                 class = c("rel", "spi"))
+  return(y)
+}
+
+prepd <- function (data, cl, weight, conf.level, kat = NULL) 
+{
+  if (any(grepl("^kra$", cl))) {
+    data <- as.matrix(data)
+  }
+  else {
+    data <- as.matrix(na.omit(data))
+  }
+  nr <- nrow(data)
+  nc <- ncol(data)
+  t <- qt(1 - (1 - conf.level)/2, nr - 1)
+  zero <- min(data, na.rm = TRUE) == 0
+  if (is.character(data)) {
+    na <- sum(grepl("^$", data))/(nr * nc) * 100
+    data <- matrix(as.numeric(as.factor(data)), nr, nc)
+    K <- max(data, na.rm = TRUE)
+  }
+  else {
+    na <- sum(is.na(data))/(nr * nc) * 100
+    K <- ifelse(any(grepl("^gac$|^bags$", cl)) & is.numeric(kat), 
+                kat, max(length(min(data, na.rm = TRUE):max(data, 
+                                                            na.rm = TRUE))))
+  }
+  if (any(grepl("^bags$", cl))) {
+    method <- "Bennett et als S"
+  }
+  else if (any(grepl("^ckap$", cl))) {
+    method <- paste0(ifelse(is.numeric(weight), "custom-weighted", 
+                            weight), " kappa")
+  }
+  else if (any(grepl("^gac$", cl))) {
+    method <- paste0(ifelse(is.numeric(weight), "custom-weighted", 
+                            weight), ifelse(grep("^unweighted$", weight), 
+                                            " AC1", " AC2"))
+  }
+  else if (any(grepl("^kra$", cl))) {
+    method <- paste0("Krippendorf's alpha with ", ifelse(is.numeric(weight), 
+                                                         "custom", weight), " weight")
+  }
+  else {
+    method <- paste0(ifelse(is.numeric(weight), "custom-weighted", 
+                            weight), " pi")
+  }
+  return(list(data = data, na = na, method = method, nr = nr, 
+              nc = nc, K = K, t = t, zero = zero))
+}
+
+ctab <- function (data, K, cl, zero) 
+{
+  if (zero == TRUE) {
+    data <- data + 1
+  }
+  if (any(!grepl("^kra$", cl))) {
+    mat <- matrix(0, K, K)
+    obs <- table(data[, 1], data[, 2])
+    mat[as.numeric(rownames(obs)), as.numeric(colnames(obs))] <- obs
+  }
+  else {
+    mu <- rowSums(!is.na(data))
+    ap <- expand.grid(seq_len(ncol(data)), seq_len(ncol(data)))
+    ap <- ap[ap[, 1] != ap[, 2], ]
+    tab <- quote(na.omit(table(data[x, ap[, 1]], data[x, 
+                                                      ap[, 2]])/(mu[x] - 1)))
+    corr <- function(x) {
+      mat <- matrix(0, K, K)
+      mat[as.numeric(rownames(eval(tab))), as.numeric(colnames(eval(tab)))] <- eval(tab)
+      return(mat)
+    }
+    mat <- Reduce("+", lapply(X = 1:nrow(data), corr))
+  }
+  return(mat)
+}
+
+wgts <- function (weight, cl, mat, K, zero) 
+{
+  if (zero == TRUE) {
+    R <- row(mat) - 1
+    C <- col(mat) - 1
+  }
+  else {
+    R <- row(mat)
+    C <- col(mat)
+  }
+  if (is.numeric(weight)) {
+    w <- weight
+  }
+  else if (any(grepl("^quadratic$", weight))) {
+    w <- 1 - (abs(R - C)/(K - 1))^2
+  }
+  else if (any(grepl("^linear$", weight))) {
+    w <- 1 - (abs(R - C)/(K - 1))
+  }
+  else if (any(grepl("^unweighted$", weight))) {
+    w <- diag(K)
+  }
+  else if (any(grepl("^ratio$", weight)) && any(grepl("kra", 
+                                                      cl))) {
+    w <- ((R - C)/(R + C))^2
+  }
+  else if (any(grepl("^ratio$", weight)) && any(grepl("gac", 
+                                                      cl))) {
+    w <- 1 - ((R - C)/(R + C))^2/((K - 1)/(K + 1))^2
+  }
+  else if (any(grepl("^interval$", weight))) {
+    w <- (R - C)^2
+  }
+  else if (any(grepl("^ordinal$", weight))) {
+    w <- matrix(0, K, K)
+    for (i in 2:(K - 1)) {
+      w[i - 1, (i + 1):K] <- t(cumsum(rowSums(mat)[i:(K - 
+                                                        1)]))
+    }
+    w[upper.tri(w)] <- w[upper.tri(w)] + (outer(rowSums(mat), 
+                                                rowSums(mat), "+")/2)[upper.tri(w)]
+    w <- (w + t(w))^2
+  }
+  else if (any(grepl("^nominal$", weight))) {
+    w <- abs(diag(ncol(mat)) - 1)
+  }
+  else {
+    stop("Please provide a valid weight")
+  }
+  return(w)
+}
 
 #-------------------------------------------------------------------------------
 #'*------------------------------ RAND INDEX ----------------------------------*
@@ -485,7 +675,7 @@ isolate(omegaMain <- function(input, output, data) {
       return(sklarsomega::sklars.omega(data, level = choices[1],
                                        confint = choices[2],
                                        control = list(
-                                         bootit = 1000,
+                                         bootit = 10,
                                          dist = choices[3])
                                        )
              )
@@ -565,6 +755,8 @@ aickinAlpha <- function(n, d=diag(1, nrow=nrow(n), ncol=ncol(n)), epsilon=1e-7, 
   #
   # Please refer to our webpage for details on each argument.
   if(ncol(n) > 2) stop('more than 2 raters!')
+  
+  if(diff(range(n)) == 0) stop('less than 2 rating values!')
   
   if(max(n) > 1000) stop('data structure is too big to calculate') 
   
@@ -646,22 +838,9 @@ byrtKappa <- function(data) {
   d <- na.omit(data)
   if(any(dim(d) == 0)) stop('no data to analyse. too many NAs?')
   
-  bfun <- function(d, i) {
-    dat <- d[i,]
-    return((2 * agr(dat)[[1]]) - 1)
-  }
-  
   byrt <- (2 * agr(d)[[1]]) - 1
   
-  bfun_byrt <- function(d,i) {
-    dat <- d[i,]
-    return((2 * agr(dat)[[1]]) - 1)
-  }
-  
-  b <- boot::boot(d, bfun_byrt, 2000)
-  ci <- boot::boot.ci(b, type = 'perc')$percent[4:5]
-  
-  return(list('po' = agr(d)[[1]], 'byrt' = byrt, 'lb' = ci[1], 'ub' = ci[2]))
+  return(list('po' = agr(d)[[1]], 'byrt' = byrt))
 }
 
 
@@ -673,21 +852,63 @@ byrtKappa <- function(data) {
 #'*--------------------------- PERCENT AGREEMENT -----------------------------'*
 #-------------------------------------------------------------------------------
 
-agr <- function(ratings) {
-    ratings <- as.matrix(na.omit(ratings))
-    ns <- nrow(ratings)
-    nr <- ncol(ratings)
-    lev <- levels(as.factor(ratings))
-    for (i in 1:ns) {
-      frow <- factor(ratings[i, ], levels = lev)
-      if (i == 1) 
-        ttab <- as.numeric(table(frow))
-      else ttab <- rbind(ttab, as.numeric(table(frow)))
-    }
-    ttab <- matrix(ttab, nrow = ns)
-    agreeP <- sum((apply(ttab^2, 1, sum) - nr)/(nr * (nr - 1))/ns)
+# agr <- function(ratings) {
+#     ratings <- as.matrix(na.omit(ratings))
+#     ns <- nrow(ratings)
+#     nr <- ncol(ratings)
+#     lev <- levels(as.factor(ratings))
+#     for (i in 1:ns) {
+#       frow <- factor(ratings[i, ], levels = lev)
+#       if (i == 1) 
+#         ttab <- as.numeric(table(frow))
+#       else ttab <- rbind(ttab, as.numeric(table(frow)))
+#     }
+#     ttab <- matrix(ttab, nrow = ns)
+#     agreeP <- sum((apply(ttab^2, 1, sum) - nr)/(nr * (nr - 1))/ns)
+#   
+#   return(list(agreeP, if(exists('ttab')) {ttab}))
+# }
+
+pa <- function (ratings) {
+  ns <- nrow(ratings)
+  nr <- ncol(ratings)
+  ratings.mat <- as.matrix(ratings)
+  n <- nrow(ratings.mat)
+  r <- ncol(ratings.mat)
+  categ <- sort(unique(na.omit(as.vector(ratings.mat))))
+  q <- length(categ)
   
-  return(list(agreeP, if(exists('ttab')) {ttab}))
+  agree.mat <- matrix(0, nrow = n, ncol = q)
+  for (k in 1:q) {
+    categ.is.k <- (ratings.mat == categ[k])
+    agree.mat[, k] <- (replace(categ.is.k, is.na(categ.is.k), FALSE)) %*% rep(1, r)
+  }
+  pa <- sum((rowSums(agree.mat^2) - nr)/(nr * (nr - 1))/ns)
+  
+  return(list('pa' = pa, 'agreeMat' = agree.mat))
+}
+
+
+agr <- function(ratings) {
+  ratings <- as.matrix(na.omit(ratings))
+  ns <- nrow(ratings)
+  nr <- ncol(ratings)
+  lev <- levels(as.factor(ratings))
+  
+  
+  # itemsByCategory <- t(apply(ratings, 1, FUN = function(row) {
+  #   as.numeric(table(factor(row, lev)))
+  # }))
+  
+  ratersByCategory <- t(apply(ratings, 2, FUN = function(row) {
+    as.numeric(table(factor(row, lev)))
+  }))
+  
+  # itemsByCategory <- matrix(itemsByCategory, nrow = ns)
+  # ratersByCategory <- matrix(ratersByCategory, nrow = nr)
+  agreeP <- pa(ratings)
+  
+  return(list('Pa' = agreeP$pa, 'itemsByCat' = agreeP$agreeMat, 'ratersByCat' = ratersByCategory))
 }
 
 
@@ -709,23 +930,23 @@ makeCi <- function(data, bfun, n = 2000) {
 doubleEntropy <- function(ratings) {
   
   mydata <- ratings
-  n <- max(ratings)
+  n <- scaleNum
   ticks <- 1:n
   ## n-Number of scales ##
   if(n < 2) {
-    print("Error: less than 2 scale values")
-    print(mydata)
+    stop("Error: less than 2 scale values")
+    #print(mydata)
     
   }
   
   # plot
-  Y<-table(mydata)
+  Y <- table(mydata)
   
   Y1<-data.frame(Y)
   
   ## m-Number of experts ##
   m<-sum(Y1[,2])
-  if(m<2) print("Error: less than 2 experts") 
+  if(m<2) stop("Error: less than 2 raters") 
   
   ## Find frequency distribution ##
   Y1<-data.frame(Y1,Y1[2]/m)
@@ -891,7 +1112,7 @@ Ks <- function(ratings) {
     return(mean(vals))
   }
   
-  print((ratings))
+  #print((ratings))
   
   if(ncol(ratings) == 2) {
     z <- stouffersZ(table(factor(ratings[,1], min(ratings):max(ratings)), factor(ratings[,2], min(ratings):max(ratings))))
@@ -1063,6 +1284,10 @@ entropy <- function(vals) {
 
 ia_c <- function(ratings) {
   
+  if(ncol(ratings) > 2) {
+    stop('more than two raters.')
+  }
+  
   contTable <- as.matrix(table(factor(ratings[,1], min(ratings):max(ratings)),
                                factor(ratings[,2], min(ratings):max(ratings))))
   
@@ -1102,10 +1327,224 @@ ia_c <- function(ratings) {
   return( 1 + (h_xf - h_xyf) / h_yf)
 }
 
+#-------------------------------------------------------------------------------
+#'*---------------------------- FLEISS KAPPA ---------------------------------'*
+#-------------------------------------------------------------------------------
 
 
 
+trim <- function (x) 
+{
+  gsub("(^[[:space:]]+|[[:space:]]+$)", "", x)
+}
+
+
+fleiss <- function (ratings, weights = 'linear', categ.labels = NULL) {
+  
+  N <- Inf
+  
+  ratings.mat <- as.matrix(ratings)
+  if (is.character(ratings.mat)) {
+    ratings.mat <- trim(toupper(ratings.mat))
+    ratings.mat[ratings.mat == ""] <- NA_character_
+  }
+  n <- nrow(ratings.mat)
+  r <- ncol(ratings.mat)
+  f <- n/N
+  if (is.null(categ.labels)) {
+    categ.init <- unique(na.omit(as.vector(ratings.mat)))
+    categ <- sort(categ.init)
+  } else {
+    categ <- toupper(categ.labels)
+  }
+  q <- length(categ)
+  
+  agree.mat <- matrix(0, nrow = n, ncol = q)
+  for (k in 1:q) {
+    categ.is.k <- (ratings.mat == categ[k])
+    agree.mat[, k] <- (replace(categ.is.k, is.na(categ.is.k), 
+                               FALSE)) %*% rep(1, r)
+  }
+  
+  if(weights != 'unweighted') {
+    w.mat <- do.call(paste0(weights, '.weights'), list(categ))
+  } else {
+    w.mat <- identity.weights(categ)
+  }
+  
+  agree.mat.w <- t(w.mat %*% t(agree.mat))
+  
+  ri.vec <- agree.mat %*% rep(1, q)
+  ri.mean <- mean(ri.vec)
+  sum.q <- (agree.mat * (agree.mat.w - 1)) %*% rep(1, q)
+  n2more <- sum(ri.vec >= 2)
+  pa <- sum(sum.q[ri.vec >= 2]/((ri.vec * (ri.vec - 1))[ri.vec >= 
+                                                          2]))/n2more
+  
+  #pi.vec <- t(t(rep(1/n, n)) %*% (agree.mat/rowSums(agree.mat)))
+  
+  pi.vec <- (colSums(agree.mat / rowSums(agree.mat)) / n)
+  
+  pe <- sum(w.mat * (pi.vec %*% t(pi.vec)))
+  
+  f <- ((pa - pe) / (1 - pe))
+  
+  return(list('f.est' = f, 'pa' = pa, 'pe' = pe))
+}
+
+
+#-------------------------------------------------------------------------------
+#'*---------------------------- COHEN KAPPA ----------------------------------'*
+#-------------------------------------------------------------------------------
+
+cohenKappa <- function (ratings, weight, sort.levels = FALSE) 
+{
+  ratings <- as.matrix(na.omit(ratings))
+  if (is.character(weight)) 
+    weight = weight
+  ns <- nrow(ratings)
+  nr <- ncol(ratings)
+  if (nr > 2) {
+    stop("Number of raters exeeds 2. Try kappam.fleiss or kappam.light.")
+  }
+  r1 <- ratings[, 1]
+  r2 <- ratings[, 2]
+  if ((is.numeric(r1)) | (is.numeric(r2))) 
+    sort.levels <- TRUE
+  if (!is.factor(r1)) 
+    r1 <- factor(r1)
+  if (!is.factor(r2)) 
+    r2 <- factor(r2)
+  if (length(levels(r1)) >= length(levels(r2))) {
+    lev <- c(levels(r1), levels(r2))
+  }
+  else {
+    lev <- c(levels(r2), levels(r1))
+  }
+  if (sort.levels) 
+    lev <- sort(lev)
+  lev <- lev[!duplicated(lev)]
+  r1 <- factor(ratings[, 1], levels = lev)
+  r2 <- factor(ratings[, 2], levels = lev)
+  ttab <- table(r1, r2)
+  nc <- ncol(ttab)
+  if (is.numeric(weight)) 
+    w <- 1 - (weight - min(weight))/(max(weight) - min(weight))
+  else {
+    if(weight != 'unweighted') {
+      w <- do.call(paste0(weight, '.weights'), list(1:ncol(ttab)))[1,]
+    } else {
+      w <- identity.weights(1:ncol(ttab))[1,]
+    }
+  }
+  
+  wvec <- c(sort(w, decreasing = FALSE), w[2:length(w)])
+  nw <- length(w)
+  weighttab <- matrix(0, nrow = nw, ncol = nw)
+  for (i in 1:nw) {
+    weighttab[i, ] <- wvec[(nw - (i - 1)):(2 * nw - i)]
+  }
+  agreeP <- sum(ttab * weighttab)/ns
+  tm1 <- apply(ttab, 1, sum)
+  tm2 <- apply(ttab, 2, sum)
+  eij <- outer(tm1, tm2)/ns
+  chanceP <- sum(eij * weighttab)/ns
+  value <- (agreeP - chanceP)/(1 - chanceP)
+  w.i <- apply(rep(tm2/ns, nc) * weighttab, 2, sum)
+  w.j <- apply(rep(tm1/ns, each = nc) * weighttab, 1, sum)
+  var.matrix <- (eij/ns) * (weighttab - outer(w.i, w.j, "+"))^2
+  varkappa <- (sum(var.matrix) - chanceP^2)/(ns * (1 - chanceP)^2)
+  SEkappa <- sqrt(varkappa)
+  u <- value/SEkappa
+  p.value <- 2 * (1 - pnorm(abs(u)))
+  rval <- structure(list(method = paste("Cohen's Kappa for 2 Raters (Weights: ", 
+                                        paste(weight, collapse = ","), ")", sep = ""), 
+                         subjects = ns, raters = nr, value = value,
+                         stat.name = "z", statistic = u, 
+                         p.value = p.value), class = "irrlist")
+  return(rval)
+}
+
+
+#-------------------------------------------------------------------------------
+#'*----------------------------- OEST KAPPA ----------------------------------'*
+#-------------------------------------------------------------------------------
+Ir <- function(ratings) {
+  all  <- agr(ratings)
+  Pa <- all[[1]]
+  k <- ncol(all[[2]])
+  mat <- all[[3]]
+  r <- nrow(mat)
+  N <- nrow(ratings)
+  
+  above <- 1 + colSums(mat)
+  below <- k + (r * N)
+  
+  Pe <- sum((above / below)^2)
+  return((Pa - Pe) / (1 - Pe))
+}
 
 
 
+#-------------------------------------------------------------------------------
+#'*--------------------------- MULTI HISTOGRAMM ------------------------------'*
+#-------------------------------------------------------------------------------
 
+multHist <- function(data) {
+  data <- as.data.frame(na.omit(data))
+  width <- 0.9 * resolution(unlist(data))
+  scaleVals <- sort(unique(as.numeric(unlist(data))))
+  scaleVals <- 1:max(scaleVals)
+  data <- pivot_longer(data, names_to = 'rater', values_to = 'ratings',
+                       cols = 1:ncol(data))
+  
+  data %<>% group_by(rater, ratings) %>% count()
+  colnames(data) <- c('rater', 'categories', 'count')
+  
+  data$categories <- factor(data$categories, levels = 1:max(scaleVals))
+  
+  histByRater <- ggplot(data, aes(x = categories, y = count, fill = rater)) +
+    geom_bar(position = position_dodge(), stat = 'identity', width = width) + 
+    geom_text(aes(x = categories, y = count + 1, label = count),
+              position = position_dodge(width = width),
+              vjust = 0.4,
+              color = histPlotText,
+              size = 5) + 
+    ylim(0, max(data$count) + 20) +
+    scale_x_discrete(drop = F) +
+    theme(panel.background = element_rect(fill = histPlotCol),
+          plot.background = element_rect(fill = histPlotCol, colour = histPlotCol),
+          panel.grid = element_line(color = 'dimgrey'),
+          axis.text = element_text(colour = histPlotText, size = 15),
+          axis.title.y = element_text(colour = '#3c8dbc', size = 20),
+          axis.title.x = element_text(colour = '#3c8dbc', size = 20))
+    ggtitle('Histogram by rater')
+    
+  
+  histByGrid <- ggplot(data, aes(x = categories, y = count)) +
+    geom_bar(stat = 'identity', fill = '#3c8dbc') +
+    geom_text(aes(y = count/2, label = count), color = histPlotText, size = 5) +
+    facet_wrap(rater ~ .) +
+    ylim(0, max(data$count) + 20) +
+    scale_x_discrete(drop = F) +
+    theme(panel.background = element_rect(fill = histPlotCol),
+          plot.background = element_rect(fill = histPlotCol, colour = histPlotCol),
+          panel.grid = element_line(color = 'dimgrey'),
+          axis.text = element_text(color = histPlotText, size = 15),
+          axis.title.y = element_text(colour = '#3c8dbc', size = 20),
+          axis.title.x = element_text(colour = '#3c8dbc', size = 20))
+    ggtitle('Grid histogram by rater')
+  
+  return(list('rainBow' = histByRater, 'grid' = histByGrid))
+}
+
+
+
+#data %>% group_by(all) %>% count() <<< counts all recurring rows in whole data
+
+# data %>%
+#   group_by(ratings, rater) %>%
+#   tally() %>% ungroup %>% 
+#   ggplot() +
+#   geom_bar(aes(x=ratings, y=n, fill = rater),stat = "identity", position = position_dodge()) +
+#   geom_text(aes(x=ratings, y=4, label = n),vjust = 0,  size = 3, position = position_dodge2(1), angle = 90)

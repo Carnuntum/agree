@@ -1,4 +1,22 @@
 
+.description_text_style {
+  text-align: justify;
+  text-justify: inter-word;
+  font-family: calibri;
+  line-height: 1.5;
+  
+}
+
+.output_style {
+  font-size: 18px;
+  font-family: calibri;
+}
+
+.output_style .table {
+  font-size: 18px;
+  font-family: calibri;
+}
+
 
 .btn {
 	transition-duration: 0.4s;
@@ -39,10 +57,30 @@ in just that row*/
   font-size: 12px;
 }*/
 
+/*.tippy-tooltip.translucent-theme {
+  background-color: dimgrey;
+}
+
+.tippy-tooltip.translucent-theme[data-placement^="bottom"] > .tippy-arrow {border-bottom-color: dimgrey;}
+
+.dropMenuStyle .table {
+  background-color: dimgrey;
+  color: white;
+}
+
+.dropMenuStyle tr:hover {
+  background-color: lightgrey;
+}*/
+
+
+
+
 .style_valuebox_OUTPUT_cyan .small-box {
   background-color: #3c8dbc !important;
   color: white ;
   box-shadow: none;
+  overflow: auto;
+  max-height: 500px;
 }
 
 .style_valuebox_OUTPUT_cyan .table {
@@ -56,7 +94,7 @@ in just that row*/
 
 
 
-.style_valuebox_PI_cyan .small-box {
+/*.style_valuebox_PI_cyan .small-box {
   background-color: #3c8dbc !important;
   box-shadow: none;
   color: white !important;
@@ -149,6 +187,8 @@ in just that row*/
 .style_valuebox_CCC_cyan tr:hover {
   background-color: #51BFFF !important;
 }
+
+*/
 
 /*.tab1 .tab-content {
   background-color: #404040;
@@ -253,9 +293,9 @@ changes all valueboxes, not really wanted
   padding-bottom: 7px;
 }
 
-.documRow {
+/*.documRow {
   padding-top: 5px;
-}
+}*/
 
 .homeDocumBtns .action-button.shiny-bound-input {
   margin-right: 20px;

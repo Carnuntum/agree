@@ -85,19 +85,20 @@ kappa_brennan <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'brennan', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(brennan_output_description),
-                                                       ' = ',
-                                                       as.character(brennan_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
+           shinyWidgets::dropMenu(
+             div(id = 'brennanDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'brennan', width = NULL)
+                          )
+                 )
+             ),
+             HTML(kableExtra::kable(t(brennan_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   )
 )
@@ -135,7 +136,7 @@ brennanOut <- function(input, output, data) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_brennan, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

@@ -71,19 +71,20 @@ kappa_byrt <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'byrt', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(byrt_output_description),
-                                                       ' = ',
-                                                       as.character(byrt_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
+           shinyWidgets::dropMenu(
+             div(id = 'byrtDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'byrt', width = NULL)
+                          )
+                 )
+             ),
+             HTML(kableExtra::kable(t(byrt_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   )
 )
@@ -104,14 +105,19 @@ byrtOut <- function(input, output, data) {
     
     l_byrt <<- lapply(vals_byrt$vals, as.data.frame)
     
-    d_byrt <- t(as.data.frame(vals_byrt$vals))
+    d_byrt <- warning_handler(as.data.frame(vals_byrt$vals))
+    
+    ci <- makeCi(data, bfun_byrt, 2000)
+    
+    d_byrt$lb <- ci[1]
+    d_byrt$ub <- ci[2]
     
     output$byrt <- renderValueBox({
       
       valueBox(
         subtitle = p(HTML(
-          kableExtra::kable(d_byrt, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+          kableExtra::kable(t(d_byrt), format = 'html') %>% 
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(
@@ -142,3 +148,8 @@ byrtOut <- function(input, output, data) {
   })
 }
 
+
+bfun_byrt <- function(d,i) {
+  dat <- d[i,]
+  return((2 * agr(dat)[[1]]) - 1)
+}

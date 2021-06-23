@@ -5,7 +5,7 @@ kappa_cohen <- tabItem(
   tabName = 'kappa_cohen',
   fluidRow(column(width = 10, 
                   offset = 1,
-                  style = 'padding-left: 0px; padding-right: -5px;',
+                  style = 'padding-left: 0px;',
                   box(
                     id = 'cohenDocum',
                     width = NULL,
@@ -53,15 +53,22 @@ kappa_cohen <- tabItem(
       width = 5,
       box(
         width = NULL,
-        height = '230px',
         fileInput(inputId = 'cohenInput',
                   label = 'Browse for .csv files'),
         h5('Choose weighting method'),
-        div(class = 'checkbox_button_css', 
-            checkboxGroupButtons(inputId = 'cohen_weight',
-                                 choices = c('unweighted',
-                                             'equal',
-                                             'squared'))),
+        div(class = 'selectInputStyle',
+            selectInput(inputId = 'cohen_weight',
+                        label = '',
+                        choices = c('unweighted',
+                                    'linear',
+                                    'quadratic',
+                                    'ordinal',
+                                    'radical',
+                                    'ratio',
+                                    'circular',
+                                    'bipolar')
+            ),
+            style = centerText),
         actionButton(
           inputId = 'cohenRun',
           label = 'calculate'
@@ -80,20 +87,20 @@ kappa_cohen <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'cohen', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(cohen_output_description),
-                                                       ' = ',
-                                                       as.character(cohen_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                                      )
-                      
-                    )
-           )
+           shinyWidgets::dropMenu(
+             div(id = 'cohenDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'cohen', width = NULL)
+                          )
+                 )
+             ),
+             HTML(kableExtra::kable(t(cohen_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   )
 )
@@ -110,7 +117,7 @@ cohenOut <- function(input, output, data) {
   tryCatch({
     choice <- input$cohen_weight
       
-    vals_cohen <- list('vals' = warning_handler(irr::kappa2(data,
+    vals_cohen <- list('vals' = warning_handler(cohenKappa(data,
                                                             if(!is.null(choice)) {weight = choice}
                                                             else {weight = 'unweighted'})),
                        'warn' = msg)
@@ -126,7 +133,7 @@ cohenOut <- function(input, output, data) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_cohen, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

@@ -9,7 +9,7 @@ other_randIndex <- tabItem(tabName = 'other_randIndex',
                          box(
                            id = 'randIndexDocum',
                            width = NULL,
-                           style = 'text-align:center; padding: 30px;',
+                           style = measure_title_style,
                            h3("The Adjusted Rand Index")
                          ),
                          hidden(
@@ -19,7 +19,7 @@ other_randIndex <- tabItem(tabName = 'other_randIndex',
                                                offset = 0,
                                                box(title = randIntex_docum_text,
                                                    width = NULL,
-                                                   style = 'text-align:center; padding: 0;')
+                                                   style = measure_title_style)
                                         )
                                )
                            )
@@ -33,7 +33,6 @@ other_randIndex <- tabItem(tabName = 'other_randIndex',
                          fluidRow(
                            box(
                              width = NULL,
-                             height = '105px',
                              p(file_upload_text),
                              style = 'text-align: center;'
                            )
@@ -41,7 +40,6 @@ other_randIndex <- tabItem(tabName = 'other_randIndex',
                          fluidRow(
                            box(
                              width = NULL,
-                             height = '105px',
                              p(file_struct_text),
                              look_down,
                              style = 'text-align: center;'
@@ -70,20 +68,21 @@ other_randIndex <- tabItem(tabName = 'other_randIndex',
                                 uiOutput('ui_randIndex')
                               ),
                               
-                              column(
-                                width = 5,
-                                fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                                         column(
-                                           width = 12,
-                                           shinyBS::popify(valueBoxOutput(outputId = 'randIndex', width = NULL), 
-                                                           title = 'What means what',
-                                                           content = paste0('<li>', names(randIndex_output_description),
-                                                                            ' = ',
-                                                                            as.character(randIndex_output_description), '</li>',
-                                                                            br()),
-                                                           placement = 'left'
+                              column(width = 5,
+                                     shinyWidgets::dropMenu(
+                                       div(id = 'randIndexDrop',
+                                           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                                                    column(
+                                                      width = 12,
+                                                      valueBoxOutput(outputId = 'randIndex', width = NULL)
+                                                    )
                                            )
-                                         ))
+                                       ),
+                                       HTML(kableExtra::kable(t(randIndex_output_description)) %>% 
+                                              kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+                                       trigger = 'mouseenter',
+                                       theme = 'translucent',
+                                       placement = 'left-start')
                               )
                      ))
 
@@ -100,17 +99,15 @@ randIndexOut <- function(input, output, data) {
     vals_randIndex <- list('vals' = warning_handler(randMain(data)),
                            'warn' = msg)
     
-    print(vals_randIndex$vals)
-    
-    d_randIndex <- warning_handler(t(data.frame(vals_randIndex$vals)))
+    d_randIndex <- warning_handler(t(data.frame(t(vals_randIndex$vals))))
     
     l_randIndex <<- warning_handler(as.data.frame(d_randIndex))
     
     output$randIndex <- renderValueBox({
       valueBox(
         subtitle = p(HTML(paste0(
-          kableExtra::kable(round(d_randIndex, 3), format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+          kableExtra::kable(d_randIndex, format = 'html') %>% 
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         
         if (!is.null(vals_randIndex$warn)) {

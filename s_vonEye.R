@@ -3,29 +3,29 @@ kappa_eye <- tabItem(
   tabName = 'kappa_eye',
   fluidRow(column(width = 10, 
                   offset = 1,
-                  style = 'padding-left: 0px; padding-right: -5px;',
+                  style = 'padding-left: 0px;',
                   box(
                     id = 'eyeDocum',
-                    width = 12,
+                    width = NULL,
                     style = measure_title_style,
                     h3("Von Eye's Kappa")
+                  ),
+                  hidden(
+                    div(id = 'eyeDocumBox',
+                        fluidRow(class = 'documRow',
+                                 column(width = 12,
+                                        offset = 0,
+                                        box(title = eye_docum_text,
+                                            width = NULL,
+                                            style = 'text-align:center; padding: 0;')
+                                 )
+                        )
+                    )
                   )
   )),
   
   fluidRow(
-    hidden(
-      div(id = 'eyeDocumBox',
-          fluidRow(class = 'documRow',
-                   column(width = 10,
-                          offset = 1,
-                          style = 'padding-left: 0px; padding-right: -5px;',
-                          box(title = eye_docum_text,
-                              width = 12,
-                              style = 'text-align:center; padding: 0;')
-                   )
-          )
-      )
-    ),
+    
     column(
       width = 5,
       offset = 1,
@@ -61,22 +61,22 @@ kappa_eye <- tabItem(
                      label = 'calculate'),
         style = centerText
       ),
-      column(
-        width = 12,
-        fluidRow(
-          class = 'style_valuebox_OUTPUT_cyan',
-          
-          width = 12,
-          shinyBS::popify(valueBoxOutput(outputId = 'eye', width = NULL), 
-                          title = 'What means what',
-                          content = paste0('<li>', names(eye_output_description),
-                                           ' = ',
-                                           as.character(eye_output_description), '</li>',
-                                           br()),
-                          placement = 'left'
-          )
-        )
-      )
+      fluidRow(column(width = 12,
+             shinyWidgets::dropMenu(
+               div(id = 'eyeDrop',
+                   fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                            column(
+                              width = 12,
+                              valueBoxOutput(outputId = 'eye', width = NULL)
+                            )
+                   )
+               ),
+               HTML(kableExtra::kable(t(eye_output_description)) %>% 
+                      kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+               trigger = 'mouseenter',
+               theme = 'translucent',
+               placement = 'left-start')
+      ))
     )
   )
 )
@@ -115,7 +115,7 @@ eyeOut <- function(input, output, data, scope = F) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_eye, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

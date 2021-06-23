@@ -7,6 +7,7 @@ kableError <- data.frame(
 
 warning_handler <- function(expr) {
   msg <<- list()
+  
   withCallingHandlers(expr,
                       warning = function(w) {
                         msg <<- append(msg, conditionMessage(w))
@@ -42,7 +43,7 @@ tooManyIcc <- function(output) {
     div(class = 'modaldiag',
         modalDialog(
           title = 'Ups.. something went wrong!',
-          'Please Select Exaclty 3 Options For The ICC Calculation!',
+          'Please select exaclty 2 options (oneway or twoway and single or average) for the ICC calculation!',
           easyClose = T,
           style = 'text-align: center;'
         )
@@ -166,7 +167,7 @@ iccErrOut <- function(output) {
 }
 
 omegaErrOut <- function(output) {
-  output$omega1 <- renderValueBox({
+  output$omega <- renderValueBox({
     tryCatch({
       input$omegaTest1
       valueBox(
@@ -258,3 +259,35 @@ invalid_data <- function(output, out_id) {
     )
   })
 }
+
+histPlotError <- function() {
+  rainbow <- 
+    ggplot() + geom_emoji("thinking", color='#3c8dbc') +
+    xlab('Some error happened! Probably incompatible data?') +
+    theme(panel.background = element_rect(fill = histPlotCol),
+          plot.background = element_rect(fill = histPlotCol, colour = histPlotCol),
+          axis.text = element_blank(),
+          axis.title.y = element_blank(),
+          axis.title.x = element_text(colour = '#3c8dbc', size = 20),
+          panel.grid = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.ticks.y = element_blank())
+  
+  grid <- 
+    ggplot() + geom_emoji("confused", color='#3c8dbc') +
+    xlab('Some error happened! Probably incompatible data?') +
+    theme(panel.background = element_rect(fill = histPlotCol),
+          plot.background = element_rect(fill = histPlotCol, colour = histPlotCol),
+          axis.text = element_blank(),
+          axis.title.y = element_blank(),
+          axis.title.x = element_text(colour = '#3c8dbc', size = 20),
+          panel.grid = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.ticks.y = element_blank())
+  
+  return(list(rainbow, grid))
+}
+
+
+
+

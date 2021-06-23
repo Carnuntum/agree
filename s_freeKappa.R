@@ -1,82 +1,83 @@
 
 kappa_free <- tabItem(
   tabName = 'kappa_free',
-  fluidRow(
     fluidRow(column(width = 10, 
                   offset = 1,
-                  style = 'padding-left: 0px; padding-right: -5px;',
+                  style = 'padding-left: 0px;',
                   box(
                     id = 'freeKappaDocum',
-                    width = 12,
+                    width = NULL,
                     style = measure_title_style,
                     h3("Carpentier's Kappa")
+                  ),
+                  hidden(
+                    div(id = 'freeKappaDocumBox',
+                        fluidRow(class = 'documRow',
+                                 column(width = 12,
+                                        offset = 0,
+                                        box(title = freeKappa_docum_text,
+                                            width = NULL,
+                                            style = 'text-align:center; padding: 0;')
+                                 )
+                        )
+                    )
                   )
   )),
-  hidden(
-    div(id = 'freeKappaDocumBox',
-        fluidRow(class = 'documRow',
-                 column(width = 10,
-                        offset = 1,
-                        style = 'padding-left: 0px; padding-right: -5px;',
-                        box(title = freeKappa_docum_text,
-                            width = 12,
-                            style = 'text-align:center; padding: 0;')
-                 )
-        )
-    )
-  ),
-  column(
-    width = 5,
-    offset = 1,
-    fluidRow(box(
-      width = NULL,
-      height = '105px',
-      p(file_upload_text),
-      style = centerText
-    )),
-    fluidRow(
-      box(
+  fluidRow(
+    
+    column(
+      width = 5,
+      offset = 1,
+      fluidRow(box(
         width = NULL,
         height = '105px',
-        p(file_struct_text),
-        look_down,
+        p(file_upload_text),
         style = centerText
-      )
-    ),
-    fluidRow(column(
-      class = 'tabStyle',
-      width = 12,
-      offset = 0,
-      style = 'padding: 0px;',
-      uiOutput('ui_freeKappa')
-    ))),
-  column(
-    width = 5,
-    box(
-      width = NULL,
-      fileInput(inputId = 'freeKappaInput',
-                label = 'Browse for .csv files'),
-      actionButton(inputId = 'freeKappaRun',
-                   label = 'calculate'),
-      style = centerText
-    ),
-    column(
-      width = 12,
+      )),
       fluidRow(
-        class = 'style_valuebox_OUTPUT_cyan',
-        
-        width = 12,
-        shinyBS::popify(valueBoxOutput(outputId = 'freeKappa', width = NULL), 
-                        title = 'What means what',
-                        content = paste0('<li>', names(freeKappa_output_description),
-                                         ' = ',
-                                         as.character(freeKappa_output_description), '</li>',
-                                         br()),
-                        placement = 'left'
+        box(
+          width = NULL,
+          height = '105px',
+          p(file_struct_text),
+          look_down,
+          style = centerText
         )
-      )
+      ),
+      fluidRow(column(
+        class = 'tabStyle',
+        width = 12,
+        offset = 0,
+        style = 'padding: 0px;',
+        uiOutput('ui_freeKappa')
+      ))),
+    column(
+      width = 5,
+      box(
+        width = NULL,
+        fileInput(inputId = 'freeKappaInput',
+                  label = 'Browse for .csv files'),
+        actionButton(inputId = 'freeKappaRun',
+                     label = 'calculate'),
+        style = centerText
+      ),
+      fluidRow(column(width = 12,
+                      shinyWidgets::dropMenu(
+                        div(id = 'freeKappaDrop',
+                            fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                                     column(
+                                       width = 12,
+                                       valueBoxOutput(outputId = 'freeKappa', width = NULL)
+                                     )
+                            )
+                        ),
+                        HTML(kableExtra::kable(t(freeKappa_output_description)) %>% 
+                               kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+                        trigger = 'mouseenter',
+                        theme = 'translucent',
+                        placement = 'left-start')
+      ))
     )
-  ))
+  )
 )
 
 
@@ -124,7 +125,7 @@ freeKappaOut <- function(input, output, data, scope) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_freeKappa, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

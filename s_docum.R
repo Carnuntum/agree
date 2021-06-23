@@ -3,53 +3,56 @@
 documentation <- tabItem(tabName = 'docum',
                          fluidRow(
                            column(
-                             width = 10,
-                             offset = 1,
+                             width = 12,
+                             offset = 0,
                              style = 'text-align: center;',
-                             titlePanel('Agreement Measures Calculator'),
+                             titlePanel(
+                               h2("Wizagree - let the shiny magic do the work!",
+                                  style = 'text-align: center; font-family: calibri;')
+                               ),
                              fluidRow(class = 'homeDocumBtns',
-                               fluidRow(actionButton(inputId = 'imp_text',
-                                            label = 'read me first',
-                                            style = 'font-size: 35px; margin: 10px;'),
-                                        hidden(
-                                          div(id = 'test1',
-                                              fluidRow(class = 'documRow',
-                                                       column(width = 10,
-                                                              offset = 1,
-                                                              box(title = docum_text,
-                                                                  width = NULL)
-                                                       )
-                                              )
-                                          )
-                                        )),
-                               fluidRow(actionButton(inputId = 'imp_text2',
-                                            label = 'read me next',
-                                            style = 'font-size: 35px; margin: 10px;'),
-                                        hidden(
-                                          div(id = 'test2',
-                                              fluidRow(class = 'documRow',
-                                                       column(width = 10,
-                                                              offset = 1,
-                                                              box(title = docum_text,
-                                                                  width = NULL)
-                                                       )
-                                              )
-                                          )
-                                        )),
-                               fluidRow(actionButton(inputId = 'imp_text3',
-                                            label = 'now read me!',
-                                            style = 'font-size: 35px; margin: 10px;'),
-                                        hidden(
-                                          div(id = 'test3',
-                                              fluidRow(class = 'documRow',
-                                                       column(width = 10,
-                                                              offset = 1,
-                                                              box(title = docum_text,
-                                                                  width = NULL)
-                                                       )
-                                              )
-                                          )
-                                        ))
+                               fluidRow(div(id = 'mainAppDescription',
+                                            fluidRow(class = 'documRow',
+                                                    column(width = 10,
+                                                           offset = 1,
+                                                           div(
+                                                             box(
+                                                               title = docum_text,
+                                                               #imageOutput('timelineImage'),
+                                                               width = NULL)
+                                                           ))
+                                                    )
+                                            )
+                                        ),
+                               # fluidRow(actionButton(inputId = 'imp_text2',
+                               #              label = 'Timeline of Agreement Measures',
+                               #              style = 'font-size: 35px; margin: 10px;'),
+                               #          hidden(
+                               #            div(id = 'test2',
+                               #                fluidRow(class = 'documRow',
+                               #                         column(width = 10,
+                               #                                offset = 1,
+                               #                                box(
+                               #                                  width = NULL,
+                               #                                  height = 'auto')
+                               #                         )
+                               #                )
+                               #            )
+                               #          )),
+                               # fluidRow(actionButton(inputId = 'imp_text3',
+                               #              label = 'now read me!',
+                               #              style = 'font-size: 35px; margin: 10px;'),
+                               #          hidden(
+                               #            div(id = 'test3',
+                               #                fluidRow(class = 'documRow',
+                               #                         column(width = 10,
+                               #                                offset = 1,
+                               #                                box(title = docum_text,
+                               #                                    width = NULL)
+                               #                         )
+                               #                )
+                               #            )
+                               #          ))
                              )
                            )
                          )
@@ -57,7 +60,9 @@ documentation <- tabItem(tabName = 'docum',
                          
                          )
 
-makeDecBox <- function(groupID, charNames, charVals, orientation = 'horizontal', individual = F) {
+makeDecBox <- function(groupID, charNames, charVals, orientation = 'horizontal', individual = F, ...) {
+  
+  args <- list(...)
   
   bttns <- div(class = 'checkbox_button_css',
     checkboxGroupButtons(inputId = groupID,
@@ -68,13 +73,36 @@ makeDecBox <- function(groupID, charNames, charVals, orientation = 'horizontal',
     )
   
   outObj <- fluidRow(column(
-    width = 10, offset = 1,
-    style = 'padding-left: 0px; padding-right: -5px;',
-    box(
-      width = NULL,
-      bttns,
-      style = centerText
-    )
+    width = if(groupID == 'scaleGroup') {10} else if(groupID == 'raterGroup') {8} else {6},
+    offset = if(groupID == 'scaleGroup') {1} else if(groupID == 'raterGroup') {2} else {3},
+    style = 'padding-left: 0px;',
+    
+    if(groupID %in% c('nomTwo', 'nomMore',
+                      'ordTwo', 'ordMore',
+                      'interTwo', 'interMore',
+                      'ratioTwo', 'ratioMore')) {
+      dropMenu(
+        div(id = paste0(groupID, 'Drop'),
+            box(
+              width = NULL,
+              bttns,
+              style = centerText
+            )),
+        HTML(kableExtra::kable(t(eval(str2expression(paste0(groupID, 'Desc'))))) %>% 
+               kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+        trigger = 'mouseenter',
+        theme = 'translucent',
+        placement = 'left-start',
+        maxWidth = '70em'
+      )
+    } else {
+      box(
+        width = NULL,
+        bttns,
+        args,
+        style = centerText
+      )
+    }
   ))
   
   return(outObj)
@@ -96,38 +124,31 @@ resetDecTree <- function(session, divList, boxList) {
 
 
 decisionTree <- tabItem(tabName = 'decTree',
-                        fluidRow(
-                          column(
-                            width = 10,
-                            offset = 1,
-                            style = 'padding-left: 0px; padding-right: -5px;',
-                            box(
-                              id = 'decTreeDocum',
-                              width = NULL,
-                              style = 'text-align:center; ',
-                              h3("Deciding Which Measure To Use"),
-                              actionButton(inputId = 'reset', 'start over')
-                            ))
-                        ),
+                        
                         div(id = 'scaleID',
                           makeDecBox('scaleGroup', c('nominal','ordinal','interval','ratio'),
                                      c('nominal','ordinal','interval','ratio'),
-                                     individual = T)),
+                                     individual = T,
+                                     ... = actionButton(inputId = 'reset', 'start over')),
+                          ),
                         
                         shinyjs::hidden(
-                          div(id = 'nRaters',
-                              makeDecBox('raterGroup', c('2 raters', 'more than 2 raters'),
-                                         c('two', 'more'),
-                                         individual = T))
+                            div(id = 'nRaters',
+                                makeDecBox('raterGroup', c('2 raters', 'more than 2 raters'),
+                                           c('two', 'more'),
+                                           individual = T))
                         ),
+                        
                         
                         shinyjs::hidden(
                           div(id = 'nominal two',
                               makeDecBox('nomTwo', nomTwoNames, nomTwoVals,
                                          orientation = 'vertical',
                                          individual = F
-                                         ))
+                              )
+                          )
                         ),
+                        
                         shinyjs::hidden(
                           div(id = 'nominal more',
                               makeDecBox('nomMore', nomMoreNames, nomMoreVals,
@@ -184,7 +205,52 @@ decisionTree <- tabItem(tabName = 'decTree',
                               ))
                         ),
                         
+                        fluidRow(
+                          column(
+                            width = 10,
+                            offset = 1,
+                            style = 'padding-left: 0px;',
+                            box(
+                              id = 'decTreeDocum',
+                              width = NULL,
+                              style = centerText,
+                              title = decTree_text,
+                              fileInput(inputId = 'histInput',
+                                        label = 'Browse for .csv files',
+                                        accept = '.csv'),
+                              actionButton(inputId = 'randomHist',
+                                           label = 'Generate example'),
+                              hidden(
+                                div(id = 'hiddenHist',
+                                    verticalLayout(
+                                      plotOutput("rainBow"),
+                                      plotOutput("gridSplit"),
+                                      br(),
+                                      downloadButton(outputId = 'plotHistDown',
+                                                     label = 'Download')
+                                    )
+                                )
+                              ),
+                              br()
+                            ))
+                        )
                         
                         
                         
                         )
+
+
+refs <- tabItem(tabName = 'refs',
+                  fluidRow(
+                    box(title = 'References',
+                        width = NULL,
+                        tags$ul(
+                          p(HTML(paste0('<li>',
+                                        refList,
+                                        '</li>',
+                                        br())
+                          )
+                          )
+                        ))
+                  )
+                )

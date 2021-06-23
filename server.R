@@ -14,10 +14,77 @@ server <- function(input, output, session) {
   # lapply(list('imp_text', 'imp_text2', 'imp_text3'), onclick,
   #        toggle(id = 'test', anim = T))
   
-  shinyjs::onclick(id = 'imp_text', toggle(id = 'test1', anim = T))
+  shinyjs::onclick(id = 'imp_text', toggle(id = 'mainAppDescription', anim = T))
   shinyjs::onclick(id = 'imp_text2', toggle(id = 'test2', anim = T))
   shinyjs::onclick(id = 'imp_text3', toggle(id = 'test3', anim = T))
   
+  observeEvent(input$randomHist, {
+    shinyjs::show('hiddenHist')
+    
+    randomHists(input, output)
+  })
+  
+  histData <- reactive({
+    read.csv(input$histInput$datapath)
+  })
+  
+  observeEvent(input$histInput, {
+    shinyjs::show('hiddenHist')
+    
+    tryCatch({
+      hists <<- multHist(histData())
+      
+      output$rainBow <- renderPlot({hists[1]}, alt = 'Ups...some error happened!')
+      output$gridSplit <- renderPlot({hists[2]}, alt = 'Ups...some error happened!')
+      
+    }, error = function(e) {
+      print(e)
+      p <- histPlotError()
+      output$rainBow <- renderPlot(
+        p[[1]]
+      )
+      output$gridSplit <- renderPlot(
+          p[[2]]
+      )
+    }, warning = function(w) {
+      print(w)
+      p <- histPlotError()
+      output$rainBow <- renderPlot(
+        p[[1]]
+      )
+      output$gridSplit <- renderPlot(
+        p[[2]]
+      )
+    })
+    
+  })
+  
+  output$plotHistDown <- downloadHandler(
+    filename = paste0('data_histogram_', Sys.Date(), '.zip'),
+    contentType = 'application/zip',
+    
+    content = function(file) {
+      
+      ggplot2::ggsave('rainbow.png', hists[[1]], dpi = 300)
+      ggplot2::ggsave('grid.png', hists[[2]], dpi = 300)
+      
+      zip(file, files = c('rainbow.png', 'grid.png'))
+      
+      if(file.exists('rainbow.png')) {file.remove('rainbow.png')}
+      if(file.exists('grid')) {file.remove('grid')}
+    })
+  
+  output$timelineDown <- downloadHandler(
+    filename = paste0('timeline_', Sys.Date(), '.png'),
+    content = function(file) {
+      writePNG(readPNG('www/timelineByStruct.png'), target = file, dpi = 300)
+    }
+  )
+  
+  # output$timelineImage <- renderImage({
+  #   list(src = 'www/timelineByStruct.png', align = 'left') #without align image overflows the box
+  # },
+  # deleteFile = F)
   
   #-----------------------------------------------------------------------------
   #'*----------------- MEASURE DOCUMENTATION TOGGLE ---------------------------*
@@ -41,6 +108,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$nomTwo, {
+    print(input$nomTwo)
     updateTabItems(session, 'dbSidebar', input$nomTwo)
   })
   observeEvent(input$nomMore, {
@@ -107,11 +175,18 @@ server <- function(input, output, session) {
   measureDocumentationShow('akappaDocum', 'akappaDocumBox')
   #free kappa
   measureDocumentationShow('freeKappaDocum', 'freeKappaDocumBox')
+  #oest kappa
+  measureDocumentationShow('oestDocum', 'oestDocumBox')
   #information agreement
   measureDocumentationShow('infoAgreeDocum', 'infoAgreeDocumBox')
-  
   #krippendorffs alpha
   measureDocumentationShow('krippDocum', 'krippDocumBox')
+  #icc
+  measureDocumentationShow('iccDocum', 'iccDocumBox')
+  #ccc
+  measureDocumentationShow('occcDocum', 'occcDocumBox')
+  #omega
+  measureDocumentationShow('omegaDocum', 'omegaDocumBox')
   
   
   #CUSTOM UPLOAD MESSAGE - PROBABLY NOT NEEDED
@@ -662,10 +737,10 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$test_byrt, {
+    byrtOut(input, output, xmp_icc)
+    
     set_tabset(output, 'ui_byrt', id = 'id_byrt', tableId = 'tab_byrt', btnInputId = 'test_byrt',
                downId = 'down_byrt', data = xmp_icc)
-    
-    byrtOut(input, output, xmp_icc)
     
     })
   
@@ -857,7 +932,7 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$test_eye, {
-    eyeOut(input, output, xmp_poly2, scope = F)
+    eyeOut(input, output, xmp_spear, scope = F)
     
   })
   
@@ -1036,6 +1111,53 @@ server <- function(input, output, session) {
     })
   
   #-----------------------------------------------------------------------------
+  #'*----------------------------- OEST KAPPA ---------------------------------*
+  #-----------------------------------------------------------------------------
+  
+  oestData <- reactive({ #user input data
+    read.csv(input$oestInput$datapath)
+  })
+  
+  
+  observeEvent(input$oestInput, {
+    set_tabset(output, 'ui_oest', id = 'id_oest', 'Uploads', 'Your Data', tableId = 'tab_oest',
+               btnInputId = 'test_oest', downId = 'down_oest', data = oestData())
+    
+  })
+  
+  observeEvent(input$test_oest, {
+    
+    oestOut(input, output, xmp_icc, scope = F)
+    
+  })
+  
+  observeEvent(input$oestRun,
+               {
+                 if (is.null(input$oestInput)) {
+                   btnPressWithoutData()
+                 } else {
+                   oestOut(input, output, oestData(), scope = T)
+                 }
+               })
+  
+  output$down_oest <- downloadHandler(
+    filename = paste0('example_oest_', Sys.Date(), '.csv'),
+    contentType = 'csv',
+    
+    content = function(file) {
+      write.csv(as.data.frame(xmp_icc), file, row.names = T)
+    })
+  
+  
+  output$oestFullDown <- downloadHandler(
+    filename = paste0('results_oest_', Sys.Date(), '.xlsx'),
+    contentType = 'xlsx',
+    
+    content = function(file) {
+      openxlsx::write.xlsx(l_oest, file, row.names = T)
+    })
+  
+  #-----------------------------------------------------------------------------
   #'*----------------------- INFORMATION AGREEMENT ----------------------------*
   #-----------------------------------------------------------------------------
   
@@ -1132,49 +1254,51 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   #'*------------------------------ OMEGA -------------------------------------*
   #-----------------------------------------------------------------------------
-  omegaData <- reactive({
+  omegaData <- reactive({ #user input data
     as.matrix(read.csv(input$omegaInput$datapath))
-  })
-  
-  observeEvent(input$omegaInput, {
-    set_tabset(output, out_id = 'ui_omega', id = 'id_omega',
-               tabTitle = 'Uploads', boxTitle = 'Your Data', tableId = 'tab_omega', downId = 'down_omega',
-               btnInputId = 'test_omega', data = omegaData())
   })
   
   shinyjs::hide(id = 'omegaSpinner')
   
-  observeEvent(input$test_omega, {
-    shinyjs::show('omegaSpinner')
-    # set_tabset(output, out_id = 'ui_omega', id = 'id_omega', tableId = 'tab_omega', downId = 'down_omega',
-    #            btnInputId = 'test_omega', data = xmp_omega)
+  observeEvent(input$omegaInput, {
+    set_tabset(output, 'ui_omega', id = 'id_omega', 'Uploads', 'Your Data', tableId = 'tab_omega',
+               btnInputId = 'test_omega', downId = 'down_omega', data = omegaData())
     
-    omegaMainOut(input, output, xmp_omega)
   })
   
-  observeEvent(input$omegaRun, {
-    if(is.null(input$omegaInput)) {
-      btnPressWithoutData()
+  observeEvent(input$test_omega, {
+    if(length(c(input$scaleChoice, input$bootChoice, input$distChoice)) != 3) {
+      tooManyOmega()
     } else {
       shinyjs::show(id = 'omegaSpinner')
-      omegaMainOut(input, output, omegaData())
+      omegaOut(input, output, xmp_omega, scope = F)
     }
   })
   
-  observeEvent(input$moreOmegaInfo, {
-    moreOmegaInfo()
-  })
+  observeEvent(input$omegaRun,
+               {
+                 if (is.null(input$omegaInput)) {
+                   btnPressWithoutData()
+                 }
+                 else if(length(c(input$scaleChoice, input$bootChoice, input$distChoice)) != 3) {
+                   tooManyOmega()
+                 } else {
+                   shinyjs::show('omegaSpinner')
+                   omegaOut(input, output, omegaData(), scope = T)
+                 }
+               })
   
   output$down_omega <- downloadHandler(
-    filename = paste0('example_data_omega_', Sys.Date(), '.csv'),
+    filename = paste0('example_omega_', Sys.Date(), '.csv'),
     contentType = 'csv',
     
     content = function(file) {
-      write.csv(xmp_omega, file, row.names = F)
+      write.csv(as.data.frame(xmp_poly2), file, row.names = T)
     })
   
-  output$omegaResDown <- downloadHandler(
-    filename = paste0('results_sklar_omega_', Sys.Date(), '.xlsx'),
+  
+  output$omegaFullDown <- downloadHandler(
+    filename = paste0('results_omega_', Sys.Date(), '.xlsx'),
     contentType = 'xlsx',
     
     content = function(file) {
@@ -1196,24 +1320,18 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$test_kripp, {
-    if(length(input$krippChoice) != 1) {
-      tooManyKripp()
-    } else {
-      set_tabset(output, out_id = 'ui_kripp', id = 'id_kripp',
-                 tableId = 'tab_kripp', downId = 'down_kripp',
-                 btnInputId = 'test_kripp', data = xmp_kripp)
-      krippMainOut(input, output, xmp_kripp)
-    }
+    set_tabset(output, out_id = 'ui_kripp', id = 'id_kripp',
+               tableId = 'tab_kripp', downId = 'down_kripp',
+               btnInputId = 'test_kripp', data = xmp_kripp)
+    krippOut(input, output, xmp_kripp)
+    
   })
   
   observeEvent(input$krippRun, {
-    if(length(input$krippChoice) != 1) {
-      tooManyKripp()
-    } 
-    else if(is.null(input$krippInput)) {
+    if(is.null(input$krippInput)) {
       btnPressWithoutData()
     } else {
-      krippMainOut(input, output, krippData())
+      krippOut(input, output, krippData())
     }
   })
   
@@ -1298,10 +1416,21 @@ server <- function(input, output, session) {
   #-----------------------------------------------------------------------------
   
   #-----------------------------------------------------------------------------
+  observeEvent(input$darkmode, {
+    histPlotCol <<- '#404040'
+    histPlotText <<- 'white'
+    mainColDark(input, output)
+  })
   
-  mainCol(input, output)
+  observeEvent(input$lightmode, {
+    histPlotCol <<- 'white'
+    histPlotText <<- 'black'
+    mainColLight(input, output)
+  })
   
-  btn_hover(input, output)
+  #mainCol(input, output)
+  
+  #btn_hover(input, output)
   #-------------------------------------------------------------------------------
   
   #-------------------------------------------------------------------------------

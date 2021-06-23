@@ -1,9 +1,9 @@
 {
-    "path" : "C:/Users/Aureus/Google Drive/1_Psychologie Master/2. Masterarbeit/agreement",
-    "sortOrder" : [
+    "path": "C:/Users/Aureus/Google Drive/1_Psychologie Master/2. Masterarbeit/agreement",
+    "sortOrder": [
         {
-            "ascending" : true,
-            "columnIndex" : 2
+            "columnIndex": 2,
+            "ascending": true
         }
     ]
 }

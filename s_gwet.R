@@ -85,19 +85,20 @@ kappa_gwet <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'gwet', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(gwet_output_description),
-                                                       ' = ',
-                                                       as.character(gwet_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
+           shinyWidgets::dropMenu(
+             div(id = 'gwetDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'gwet', width = NULL)
+                          )
+                 )
+             ),
+             HTML(kableExtra::kable(t(gwet_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   )
 )
@@ -135,7 +136,7 @@ gwetOut <- function(input, output, data) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_gwet, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

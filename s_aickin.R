@@ -71,19 +71,20 @@ kappa_aickin <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'aickin', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(aickin_output_description),
-                                                       ' = ',
-                                                       as.character(aickin_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
+           shinyWidgets::dropMenu(
+             div(id = 'aickinDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'aickin', width = NULL)
+                          )
+                 )
+             ),
+             HTML(kableExtra::kable(t(aickin_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   )
 )
@@ -113,7 +114,7 @@ aickinOut <- function(input, output, data) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_aickin, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

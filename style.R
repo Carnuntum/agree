@@ -1,59 +1,158 @@
-
 navbarCol <- tags$style(HTML(
   '.skin-blue .main-header .navbar {transition:1s}
-   .skin-blue .main-header .navbar:hover {background-color: dimgrey}'
+           .skin-blue .main-header .navbar:hover {background-color: dimgrey}'
 ))
 bodyCol <- tags$style(HTML(
   '.content-wrapper {background-color: dimwhite;}'))
 
+dropMenuStyle <- tags$style(HTML(
+  '.tippy-tooltip.translucent-theme {background-color: #3c8dbc !important;}
+          
+  .tippy-tooltip.translucent-theme[data-placement^="left-start"] > .tippy-arrow {border-left-color: #3c8dbc;}
+  
+  .tippy-tooltip .table {background-color: #3c8dbc !important; color: white;}
+  
+  .tippy-tooltip tr:hover {background-color: #51BFFF !important;}
+  
+  '
+))
+
 boxCol <- tags$style(HTML(
   '.box.box{
-      border-style: solid;
-      border-bottom-color:white;
-      border-left-color:white;
-      border-right-color:white;
-      border-top-color:white;
-      background:white
-    }'))
+          border-style: solid;
+          border-bottom-color:white;
+          border-left-color:white;
+          border-right-color:white;
+          border-top-color:white;
+          background:white
+          }'
+))
 
 tabCol <- tags$style(HTML(
   ".tabStyle .tab-content {
-      background-color: white;
-      color: black
-    }
-    
-    .tabStyle .nav > li > a {
-      background-color: white;
-      color: black;
-    }
-    
-    .tabStyle .nav > li > a {
-      background-color: white;
-      color: black;
-    }
-    
-    .tabStyle .nav > li[class=active] > a {
-      background-color: dimwhite;
-      color: black;
-    }
-    
-    .tabStyle .nav > li > a:hover {
-      background-color: dimwhite;
-      color: black;
-      
-    .tabSTyle .nav > li[class=active] > a:hover {
-      background-color: dimwhite;
-      color: black;
-    }
-    }"
+          background-color: white;
+          color: black
+          }
+          
+          .tabStyle .nav > li > a {
+          background-color: white;
+          color: black;
+          }
+          
+          .tabStyle .nav > li > a {
+          background-color: white;
+          color: black;
+          }
+          
+          .tabStyle .nav > li[class=active] > a {
+          background-color: dimwhite;
+          color: black;
+          }
+          
+          .tabStyle .nav > li > a:hover {
+          background-color: dimwhite;
+          color: black;
+          
+          .tabSTyle .nav > li[class=active] > a:hover {
+          background-color: dimwhite;
+          color: black;
+          }
+          }"
 ))
 
+histPlotCol <<- 'white'
+histPlotText <<- 'black'
 
-mainCol <- function(input, output) {
+
+mainColLight <- function(input, output) {
   
   output$dark <- renderUI({
-    if (input$darkmode %% 2 != 0) {
       list(
+        navbarCol <- tags$style(HTML(
+          '.skin-blue .main-header .navbar {transition:1s}
+           .skin-blue .main-header .navbar:hover {background-color: dimgrey}'
+        )),
+        bodyCol <- tags$style(HTML(
+          '.content-wrapper {background-color: dimwhite;}')),
+        
+        dropMenuStyle <- tags$style(HTML(
+          '.tippy-tooltip.translucent-theme {background-color: #3c8dbc !important;}
+          
+          .tippy-tooltip.translucent-theme[data-placement^="left-start"] > .tippy-arrow {border-left-color: #3c8dbc;}
+          
+          .tippy-tooltip .table {background-color: #3c8dbc !important; color: white;}
+          
+          .tippy-tooltip tr:hover {background-color: #51BFFF !important;}
+          
+          '
+        )),
+        
+        boxCol <- tags$style(HTML(
+          '.box.box{
+          border-style: solid;
+          border-bottom-color:white;
+          border-left-color:white;
+          border-right-color:white;
+          border-top-color:white;
+          background:white
+          }'
+        )),
+        
+        tabCol <- tags$style(HTML(
+          ".tabStyle .tab-content {
+          background-color: white;
+          color: black
+          }
+          
+          .tabStyle .nav > li > a {
+          background-color: white;
+          color: black;
+          }
+          
+          .tabStyle .nav > li > a {
+          background-color: white;
+          color: black;
+          }
+          
+          .tabStyle .nav > li[class=active] > a {
+          background-color: dimwhite;
+          color: black;
+          }
+          
+          .tabStyle .nav > li > a:hover {
+          background-color: dimwhite;
+          color: black;
+          
+          .tabSTyle .nav > li[class=active] > a:hover {
+          background-color: dimwhite;
+          color: black;
+          }
+          }"
+        ))
+      )
+    
+  })
+}
+
+
+mainColDark <- function(input, output) {
+  
+  output$dark <- renderUI({
+      list(
+        
+        dropMenuStyle <- tags$style(HTML(
+          '.tippy-tooltip.translucent-theme {background-color: #3c8dbc !important;}
+          
+          .tippy-tooltip.translucent-theme[data-placement^="left-start"] > .tippy-arrow {border-left-color: #3c8dbc;}
+          
+          .tippy-tooltip .table {background-color: #3c8dbc !important; color: white;}
+          
+          .tippy-tooltip tr:hover {background-color: #51BFFF !important;}
+          
+          '
+        )),
+        
+        
         bodyCol <- tags$style(
         '.content-wrapper {background-color: #2E2E2E;}'),
         boxCol <- tags$style(
@@ -65,6 +164,7 @@ mainCol <- function(input, output) {
           border-right-color:#404040;
           border-top-color:white;
           background:#404040;
+          color: white;
           }
           
           .shiny-input-container{
@@ -118,22 +218,22 @@ mainCol <- function(input, output) {
             }"
           )
         ))
-    }
+    
   })
 }
 
-btn_hover <- function(input, output) {
-  output$bttnCol <- renderUI({
-    if (input$changCol %% 2 != 0) {
-      bttnCol <- tags$style(
-        '.btn {transition-duration:0.4s}
-          .btn:hover {
-          background-color:darkcyan;
-          color:white}'
-      )
-    }
-  })
-}
+# btn_hover <- function(input, output) {
+#   output$bttnCol <- renderUI({
+#     if (input$changCol %% 2 != 0) {
+#       bttnCol <- tags$style(
+#         '.btn {transition-duration:0.4s}
+#           .btn:hover {
+#           background-color:darkcyan;
+#           color:white}'
+#       )
+#     }
+#   })
+# }
 
 js_upload_msg_ordinalInput <- "
 Shiny.addCustomMessageHandler('upload_msg', function(msg) {

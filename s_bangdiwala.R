@@ -84,19 +84,20 @@ other_bangdiwala <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'bangdiwala', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(bangdiwala_output_description),
-                                                       ' = ',
-                                                       as.character(bangdiwala_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
+           shinyWidgets::dropMenu(
+             div(id = 'bangdiwalaDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'bangdiwala', width = NULL)
+                          )
+                 )
+             ),
+             HTML(kableExtra::kable(t(bangdiwala_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   ),
   shinyjs::hidden(
@@ -127,11 +128,15 @@ bangdiwalaOut <- function(input, output, data) {
     
     data <- na.omit(data)
     
-    w <- warning_handler(do.call(paste0(choice, '.weights', collapse = ''), args = list(1:max(data)))[1,])
+    if(ncol(data) > 2) {warning_handler(stop('computation is only possible for 2 raters!'))}
     
-    bangdi_data <<- table(data[,1], data[,2])
+    w <- warning_handler(do.call(paste0(choice, '.weights', collapse = ''), args = list(min(data):max(data)))[1,])
     
-    vals_bangdiwala <- list('vals' = warning_handler(vcd::agreementplot(bangdi_data, weights = w, return_grob = T)),
+    bangdi_data <<- table(factor(data[,1], min(data):max(data)), factor(data[,2], min(data):max(data)))
+    
+    vals_bangdiwala <- list('vals' = warning_handler(vcd::agreementplot(bangdi_data,
+                                                                        weights = if(!is.nan(w)) {w} else {c(1,0)},
+                                                                        return_grob = T)),
                             'warn' = msg)
     
     bangdiwala_plot <<- attributes(vals_bangdiwala$vals)$grob
@@ -153,10 +158,7 @@ bangdiwalaOut <- function(input, output, data) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_bangdiwala[1:2,1], format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
-          
-          kableExtra::kable(bangdiwala_weights, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

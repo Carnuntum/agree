@@ -9,8 +9,12 @@ library(shinyjs)
 library(shinydashboard)
 library(kableExtra)
 library(DescTools)
-library(rel)
+#library(rel) #removed from cran
+library(vcd) #bangdiwala
 library(irr)
+library(emojifont) #for emoji error plots
+library(png)
+library(gridExtra)
 library(VGAM)
 library(sklarsomega)
 library(BlandAltmanLeh)
@@ -40,8 +44,32 @@ source('server.R')
 options(scipen = 999)
 useShinyjs()
 
-ui <- dashboardPage(header = header,
-                    sidebar = sidebar,
-                    body = body,
-                    skin = 'blue'
+ui <- shiny::tagList(
+  dashboardPage(header = header,
+                sidebar = sidebar,
+                body = body,
+                skin = 'blue',
+                
+                # tags$head(tags$style(
+                #   type="text/css",
+                #   "#timelineImage img {max-width: 100%; width: 100%; height: auto;}"
+                # ),
+                tags$head(
+                  tags$style(
+                    type="text/css",
+                    "#timelineImage img {max-width: 100%; width: 100%; height: auto;}"
+                  )
+                )
+  ),
+  # tags$footer(p(tagList("CC BY-NC", HTML('&copy')), style = "
+  #             text-align: right;
+  #             position: relative;
+  #             bottom: 0;
+  #             left: 0;
+  #             right: 0;
+  #             width:100%;
+  #             font-size: 15px;
+  #             height: 20px;   /* Height of the footer */
+  #             padding: 0px;
+  #             "))
 )

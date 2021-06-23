@@ -3,42 +3,40 @@ other_entropy <- tabItem(
   tabName = 'other_entropy',
   fluidRow(column(width = 10, 
                   offset = 1,
-                  style = 'padding-left: 0px; padding-right: -5px;',
+                  style = 'padding-left: 0;',
                   box(
                     id = 'entropyDocum',
-                    width = 12,
+                    width = NULL,
                     style = measure_title_style,
                     h3("The Double Entropy Index")
+                  ),
+                  hidden(
+                    div(id = 'entropyDocumBox',
+                        fluidRow(class = 'documRow',
+                                 column(width = 12,
+                                        offset = 0,
+                                        box(title = entropy_docum_text,
+                                            width = NULL,
+                                            style = measure_title_style)
+                                 )
+                        )
+                    )
                   )
   )),
   
   fluidRow(
-    hidden(
-      div(id = 'entropyDocumBox',
-          fluidRow(class = 'documRow',
-                   column(width = 10,
-                          offset = 1,
-                          style = 'padding-left: 0px; padding-right: -5px;',
-                          box(title = entropy_docum_text,
-                              width = 12,
-                              style = 'text-align:center; padding: 0;')
-                   )
-          )
-      )
-    ),
+    
     column(
       width = 5,
       offset = 1,
       fluidRow(box(
         width = NULL,
-        height = '105px',
         p(file_upload_text),
         style = centerText
       )),
       fluidRow(
         box(
           width = NULL,
-          height = '105px',
           p(file_struct_text),
           look_down,
           style = centerText
@@ -70,16 +68,22 @@ other_entropy <- tabItem(
           shinycssloaders::withSpinner(
             type = getOption("spinner.type", default = 7),
             color = getOption("spinner.color", default = "#3c8dbc"),
-            proxy.height = '200px',
+            proxy.height = '50px',
             
-            ui_element = shinyBS::popify(valueBoxOutput(outputId = 'entropy', width = NULL), 
-                                         title = 'What means what',
-                                         content = paste0('<li>', names(entropy_output_description),
-                                                          ' = ',
-                                                          as.character(entropy_output_description), '</li>',
-                                                          br()),
-                                         placement = 'left'
-            ),
+            ui_element = shinyWidgets::dropMenu(
+              div(id = 'entropyDrop',
+                  fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                           column(
+                             width = 12,
+                             valueBoxOutput(outputId = 'entropy', width = NULL)
+                           )
+                  )
+              ),
+              HTML(kableExtra::kable(t(entropy_output_description)) %>% 
+                     kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+              trigger = 'mouseenter',
+              theme = 'translucent',
+              placement = 'left-start'),
             
             id = 'entropySpinner'
           )
@@ -88,7 +92,6 @@ other_entropy <- tabItem(
     )
   )
 )
-
 
 
 
@@ -105,7 +108,11 @@ entropyOut <- function(input, output, data, scope = F) {
       tryCatch({
         isolate({
           
-          data <- na.omit(data)
+          data <- t(na.omit(data))
+          min <- range(data)[1]
+          max <- range(data)[2]
+          scaleNum <<- length(seq(min, max, 1))
+          
           
           if(ncol(data) == 1) {
             vals <- warning_handler(doubleEntropy(data))
@@ -118,10 +125,13 @@ entropyOut <- function(input, output, data, scope = F) {
           
           l_entropy <<- lapply(vals_entropy$vals, as.data.frame)
           
-          ci <- warning_handler(makeCi(data, bfun_entropy))
+          # ci <- warning_handler(makeCi(data, bfun_entropy))
+          # 
+          # vals_entropy$vals$lb <- ci[1]
+          # vals_entropy$vals$ub <- ci[2]
           
-          vals_entropy$vals$lb <- ci[1]
-          vals_entropy$vals$ub <- ci[2]
+          vals_entropy$vals$items <- ncol(data)
+          vals_entropy$vals$raters <- nrow(data)
           
           d_entropy <- t(as.data.frame(vals_entropy$vals))
           
@@ -145,7 +155,7 @@ entropyOut <- function(input, output, data, scope = F) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_entropy, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(
@@ -178,17 +188,19 @@ entropyOut <- function(input, output, data, scope = F) {
 
 
 
-bfun_entropy <- function(d,i) {
-  dat <- d[i,]
-  
-  if(ncol(dat) == 1) {
-    return(doubleEntropy(dat))
-  } else if(any(lapply(dat, mean) == 1)) {
-    return(0)
-  } else {
-    return(mean(apply(dat, 2, doubleEntropy)))
-  }
-}
+# bfun_entropy <- function(d,i) {
+#   if(is.data.frame(d)) {
+#     dat <- d[i,]
+#   } else {
+#     dat <- d
+#   }
+#   
+#   if(!is.data.frame(dat)) {
+#     return(jitter(doubleEntropy(dat)))
+#   } else {
+#     return(jitter(mean(apply(data, 2, doubleEntropy))))
+#   }
+# }
 
 
 

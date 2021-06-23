@@ -71,27 +71,26 @@ kappa_pi <- tabItem(tabName = 'kappa_pi',
                fluidRow(
                  class = 'tabStyle',
                  column(
-                   width = 5, 
+                   width = 5,
                    offset = 1,
                    style = 'padding: 0px;',
                    uiOutput('ui_pi')
                    ),
-                 column(
-                   width = 5,
-                   fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                            column(
-                              width = 12,
-                              style = centerText,
-                              shinyBS::popify(valueBoxOutput(outputId = 'pi1', width = NULL), 
-                                              title = 'What means what',
-                                              content = paste0('<li>', names(pi_output_description),
-                                                               ' = ',
-                                                               as.character(pi_output_description), '</li>',
-                                                               br()),
-                                              placement = 'left'
+                 column(width = 5,
+                        shinyWidgets::dropMenu(
+                          div(id = 'piDrop',
+                              fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                                       column(
+                                         width = 12,
+                                         valueBoxOutput(outputId = 'pi1', width = NULL)
+                                       )
                               )
-                              ))
-                   
+                          ),
+                          HTML(kableExtra::kable(t(pi_output_description)) %>% 
+                                 kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+                          trigger = 'mouseenter',
+                          theme = 'translucent',
+                          placement = 'left-start')
                  )
                )
 )
@@ -107,9 +106,7 @@ piOut <- function(input, output, data) {
   tryCatch({
     choice <- input$pi_weight
     
-    vals_pi <- rel::spi(data, if(!is.null(choice)) {weight = choice} else {
-      weight = 'unweighted'
-    })
+    vals_pi <- warning_handler(spi(data, if(!is.null(choice)) {weight = choice} else {weight = 'unweighted'}))
     
     vals_pi$call <- NULL
     l_pi <<- lapply(vals_pi, as.data.frame)
@@ -125,7 +122,7 @@ piOut <- function(input, output, data) {
         valueBox(
           subtitle = p(HTML(
             kableExtra::kable(d_pi, format = 'html') %>% 
-              kableExtra::kable_styling('basic')
+              kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')
           ),
           div(
             downloadButton(outputId = 'piFullDown',

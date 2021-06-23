@@ -71,19 +71,20 @@ other_occc <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'occc', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(occc_output_description),
-                                                       ' = ',
-                                                       as.character(occc_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
+           shinyWidgets::dropMenu(
+             div(id = 'occcDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'occc', width = NULL)
+                          )
+                 )
+             ),
+             HTML(kableExtra::kable(t(occc_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   ),
   fluidRow(
@@ -119,9 +120,7 @@ other_occc <- tabItem(
 occcOut <- function(input, output, data, scope = F) {
   
   tryCatch({
-    
-    
-    
+  
     vals_occc <- list('vals' = warning_handler(epiR::epi.occc(data, pairs = T, na.rm = T)),
                       'warn' = msg)
     
@@ -130,17 +129,27 @@ occcOut <- function(input, output, data, scope = F) {
       return(epiR::epi.occc(dat)$occc)
     }
     
-    ci <- warning_handler(makeCi(data, bfun))
+    if(!is.nan(vals_occc$vals$occc)) {
+      ci <- warning_handler(makeCi(data, bfun))
+    }
     
     vals_scale_location <- as.data.frame(vals_occc$vals$pairs) %>% dplyr::select(-ksi, -ccc)
+    
+    vals_loc <<- (vals_scale_location)
     
     l_occc <<- lapply(vals_occc$vals, as.data.frame)
     
     l_occc <<- append(l_occc, vals_scale_location)
     
     d_occc <- as.data.frame(vals_occc$vals[1:3])
-    d_occc$lb <- ci[1]
-    d_occc$ub <- ci[2]
+    d_occc$`mean scale shift` <- mean(abs(vals_scale_location$scale))
+    d_occc$`mean location shift` <- mean(abs(vals_scale_location$location))
+    
+    if(!is.nan(vals_occc$vals$occc)) {
+      d_occc$lb <- ci[1]
+      d_occc$ub <- ci[2]
+    }
+    
     
     if(dim(data)[2] == 2) {
       shinyjs::show('div_plot_occc', anim = T)
@@ -166,10 +175,10 @@ occcOut <- function(input, output, data, scope = F) {
       valueBox(
         subtitle = p(HTML(paste0(
           kableExtra::kable(t(d_occc), format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
           kableExtra::kable(vals_scale_location, format = 'html') %>% 
-            kableExtra::kable_styling('basic')
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')
         )),
         div(
           if(!is.null(msg)) {
@@ -342,7 +351,7 @@ occcOut <- function(input, output, data, scope = F) {
 #       valueBox(
 #         value = p(HTML(
 #           kableExtra::kable(d_ccc, format = 'html') %>% 
-#             kableExtra::kable_styling('basic'),
+#             kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
 #           
 #         ),
 #         div(

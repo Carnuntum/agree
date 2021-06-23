@@ -71,19 +71,20 @@ other_awg <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'awg', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(awg_output_description),
-                                                       ' = ',
-                                                       as.character(awg_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
+           shinyWidgets::dropMenu(
+             div(id = 'awgDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'awg', width = NULL)
+                          )
+                 )
+             ),
+             HTML(kableExtra::kable(t(awg_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   )
 )
@@ -104,6 +105,17 @@ awgOut <- function(input, output, data) {
     
     l_awg <<- lapply(vals_awg$vals, as.data.frame)
     
+    M <- mean(unlist(data[,2:ncol(data)]))
+    L <- min(data)
+    H <- max(data)
+    k <- ncol(data)
+    
+    vals_awg$vals$mean <- M
+    min <- (L * (k - 1) + H) / k
+    max <- (H * (k - 1) + L) / k
+    vals_awg$vals$`valid mean interval` <- paste0('[', min, ', ', max, ']')
+    vals_awg$vals$interpretable <- ifelse(M < min || M > max, 'no', 'yes')
+    
     d_awg <- t(as.data.frame(vals_awg$vals))
     
     if(dim(d_awg)[2] > 10) {
@@ -115,7 +127,7 @@ awgOut <- function(input, output, data) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_awg, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

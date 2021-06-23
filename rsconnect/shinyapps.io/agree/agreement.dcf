@@ -5,9 +5,10 @@ account: agree
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4083514
-bundleId: 4569981
+bundleId: 4746852
 url: https://agree.shinyapps.io/agreement/
-when: 1620392943.83721
-lastSyncTime: 1620392943.83721
+when: 1624440995.29063
+lastSyncTime: 1624440995.29063
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: .RData|.vscode/settings.json|archived_pkgs/CrossClustering_4.0.3.tar.gz|ccc_more_than_2_raters_average.R|cpptemp.cpp|grid.png|INFO.txt|lineCounter.R|nba_2013.csv|readme.txt|temp.exe|test.png|todo.txt|www/test.jpg|www/timelineByStruct2.png

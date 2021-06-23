@@ -13,13 +13,21 @@ header <- dashboardHeader(title = 'Agreement Measures',
                                                             height: 30px;
                                                             font-size: 15px;'),
                                                
-                                               actionButton(inputId = 'changCol', 
-                                                            label = 'change hover',
+                                               actionButton(inputId = 'lightmode', 
+                                                            label = 'lightmode',
                                                             width = '140px',
                                                             style = '
-                                                            margin-top: 10px;
                                                             height: 30px;
+                                                            margin-top: 10px;
                                                             font-size: 15px;'),
+                                               
+                                               # actionButton(inputId = 'changCol', 
+                                               #              label = 'change hover',
+                                               #              width = '140px',
+                                               #              style = '
+                                               #              margin-top: 10px;
+                                               #              height: 30px;
+                                               #              font-size: 15px;'),
                                                
                                                #NAVIGATION BACK TO HOME TAB
                                                actionButton(inputId = 'home',

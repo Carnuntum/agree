@@ -1,5 +1,5 @@
 
-icc <- tabItem(tabName = 'icc',
+other_icc <- tabItem(tabName = 'other_icc',
                useShinyjs(),
                     fluidRow(
                       column(
@@ -7,9 +7,22 @@ icc <- tabItem(tabName = 'icc',
                         offset = 1,
                         style = 'padding-left: 0px; padding-right: -5px;',
                         box(
+                          id = 'iccDocum',
                           width = NULL,
-                          style = 'text-align:center; padding: 30px;',
-                          h3("Interrater Correlation")
+                          style = measure_title_style,
+                          h3("Intraclass Correlation Coefficient")
+                        ),
+                        hidden(
+                          div(id = 'iccDocumBox',
+                              fluidRow(class = 'documRow',
+                                       column(width = 12,
+                                              offset = 0,
+                                              box(title = icc_docum_text,
+                                                  width = NULL,
+                                                  style = measure_title_style)
+                                       )
+                              )
+                          )
                         )
                       )
                     ),
@@ -20,7 +33,6 @@ icc <- tabItem(tabName = 'icc',
                         fluidRow(
                           box(
                             width = NULL,
-                            height = '131px',
                             p(file_upload_text),
                             style = 'text-align: center;'
                           )
@@ -28,7 +40,6 @@ icc <- tabItem(tabName = 'icc',
                         fluidRow(
                           box(
                             width = NULL,
-                            height = '131px',
                             p(file_struct_text),
                             look_down,
                             style = 'text-align: center;'
@@ -72,12 +83,23 @@ icc <- tabItem(tabName = 'icc',
                              ),
                              column(
                                width = 5,
-                               fluidRow(class = 'style_valuebox_ICC_cyan',
-                                        column(
-                                          width = 12,
-                                          valueBoxOutput(
-                                            outputId = 'icc1',
-                                            width = NULL)))
+                               dropMenu(
+                                 div(id = 'iccDrop',
+                                     fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                                              column(
+                                                width = 12,
+                                                valueBoxOutput(
+                                                  outputId = 'icc1',
+                                                  width = NULL)
+                                                )
+                                              )
+                                     ),
+                                 HTML(kableExtra::kable(t(icc_output_description)) %>% 
+                                        kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+                                 trigger = 'mouseenter',
+                                 theme = 'translucent',
+                                 placement = 'left-start'
+                               )
                                
                              )
                     )
@@ -86,7 +108,7 @@ icc <- tabItem(tabName = 'icc',
 
 iccMainOut <- function(input, output, data, test = F) {
   
-  test <- iccMain(input, output, data, test)
+  test <- warning_handler(iccMain(input, output, data, test))
   
   tryCatch({
     
@@ -101,12 +123,10 @@ iccMainOut <- function(input, output, data, test = F) {
       'Unit' = test$unit,
       'ICC Name' = test$icc.name,
       'Value' = test$value,
-      'Null Hypothesis' = test$r0,
       'F Statistic' = test$Fvalue,
       'df-1' = test$df1,
       'df-2' = test$df2,
       'p-value' = test$p.value,
-      'Confidence Level' = test$conf.level,
       'Lower CI' = test$lbound,
       'Upper CI' = test$ubound
     ))
@@ -117,7 +137,7 @@ iccMainOut <- function(input, output, data, test = F) {
         valueBox(
           value = p(HTML(
             kableExtra::kable(d_icc, format = 'html') %>% 
-              kableExtra::kable_styling('basic'),
+              kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
             
           ),
           div(

@@ -53,9 +53,22 @@ kappa_fleiss <- tabItem(
       width = 5,
       box(
         width = NULL,
-        height = '230px',
         fileInput(inputId = 'fleissInput',
                   label = 'Browse for .csv files'),
+        h5('Choose weighting method'),
+        div(class = 'selectInputStyle',
+            selectInput(inputId = 'fleiss_weight',
+                        label = '',
+                        choices = c('unweighted',
+                                    'linear',
+                                    'quadratic',
+                                    'ordinal',
+                                    'radical',
+                                    'ratio',
+                                    'circular',
+                                    'bipolar')
+            ),
+            style = centerText),
         actionButton(
           inputId = 'fleissRun',
           label = 'calculate'
@@ -73,21 +86,22 @@ kappa_fleiss <- tabItem(
       uiOutput('ui_fleiss')
     ),
     
-    column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'fleiss', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(fleiss_output_description),
-                                                       ' = ',
-                                                       as.character(fleiss_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
-    )
+     column(width = 5,
+            shinyWidgets::dropMenu(
+              div(id = 'fleissDrop',
+                  fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                           column(
+                             width = 12,
+                             valueBoxOutput(outputId = 'fleiss', width = NULL)
+                           )
+                  )
+              ),
+              HTML(kableExtra::kable(t(fleiss_output_description)) %>% 
+                     kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+              trigger = 'click',
+              theme = 'translucent',
+              placement = 'left-start')
+     )
   )
 )
 
@@ -102,21 +116,30 @@ fleissOut <- function(input, output, data) {
   
   tryCatch({
     
-    vals_fleiss <- list('vals' = warning_handler(irr::kappam.fleiss(data, exact = F, detail = F)),
+    choice <<- input$fleiss_weight
+    
+    vals_fleiss <- list('vals' = warning_handler(fleiss(data, choice)),
                        'warn' = msg)
     
     l_fleiss <<- lapply(vals_fleiss$vals, as.data.frame)
     
-    class(vals_fleiss$vals) <- 'list'
+    d_fleiss <- (as.data.frame(vals_fleiss$vals))
     
-    d_fleiss <- t(as.data.frame(vals_fleiss$vals))
+    if(!is.nan(vals_fleiss$vals$f.est)) {
+      ci <- warning_handler(makeCi(data, bfun_fleiss))
+      
+      d_fleiss$lb <- ci[1]
+      d_fleiss$ub <- ci[2]
+    }
+    
+    d_fleiss <- t(d_fleiss)
     
     output$fleiss <- renderValueBox({
       
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_fleiss, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(
@@ -145,4 +168,9 @@ fleissOut <- function(input, output, data) {
     invalid_data(output, 'fleiss')
     print(w)
   })
+}
+
+bfun_fleiss <- function(d, i) {
+  dat <- d[i,]
+  return(fleiss(dat, choice)$f.est)
 }

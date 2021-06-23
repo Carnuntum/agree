@@ -71,19 +71,20 @@ other_rwg <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'rwg', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(rwg_output_description),
-                                                       ' = ',
-                                                       as.character(rwg_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
+           shinyWidgets::dropMenu(
+             div(id = 'rwgDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'rwg', width = NULL)
+                          )
+                 )
+             ),
+             HTML(kableExtra::kable(t(rwg_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   )
 )
@@ -110,20 +111,30 @@ rwgOut <- function(input, output, data) {
     }
     
     if(ncol(data) == 2) {
-      vals_rwg <- list('vals' = warning_handler(rwg(data[,2:ncol(data)], data[,1])),
+      vals_rwg <- list('vals' = warning_handler(list('rwg' = rwg(data[,2:ncol(data)], data[,1]))),
                        'warn' = msg)
       
       b <- warning_handler(boot::boot(data, bfun_rwg, 2000))
       ci <- warning_handler(boot::boot.ci(b, type = 'perc')$percent[4:5])
       
+      vals_rwg$vals$lb <- ci[1]
+      vals_rwg$vals$ub <- ci[2]
+      
+      full_rwg <- as.data.frame(rwg(data[,2:ncol(data)], data[,1]))
+      
       #vals_rwg$vals <- as.data.frame(append(as.list(vals_rwg$vals), c('lb' = ci[1], 'ub' = ci[2])))
       
     } else {
-      vals_rwg <- list('vals' = warning_handler(rwg.j(data[,2:ncol(data)], data[,1])),
+      vals_rwg <- list('vals' = warning_handler(list('rwg' = mean(rwg.j(data[,2:ncol(data)], data[,1])$rwg.j))),
                        'warn' = msg)
+      
+      full_rwg <- (as.data.frame(rwg.j(data[,2:ncol(data)], data[,1])))
       
       b <- warning_handler(boot::boot(data, bfun_rwgj, 2000))
       ci <- warning_handler(boot::boot.ci(b, type = 'perc')$percent[4:5])
+      
+      vals_rwg$vals$lb <- ci[1]
+      vals_rwg$vals$ub <- ci[2]
       
       #vals_rwg$vals <- as.data.frame(append(as.list(vals_rwg$vals), c('lb' = ci[1], 'ub' = ci[2])))
     }
@@ -139,11 +150,13 @@ rwgOut <- function(input, output, data) {
     output$rwg <- renderValueBox({
       
       valueBox(
-        subtitle = p(HTML(
+        subtitle = p(HTML(paste0(
           kableExtra::kable(d_rwg, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
-          
-        ),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
+          br(),
+          kableExtra::kable(full_rwg, format = 'html') %>% 
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')
+        )),
         div(
           if(!is.null(msg)) {
             p(HTML(paste0(

@@ -7,9 +7,10 @@ src_body <- list.files(pattern = '^s_')
 lapply(src_body, source)
 
 
+
+
 body <- dashboardBody(
   includeCSS('style.css'),
-  
   # fixedPanel(
   #   style = "z-index: 100;",
   #   dropdownButton(
@@ -53,6 +54,7 @@ body <- dashboardBody(
   bodyCol,
   boxCol,
   tabCol,
+  dropMenuStyle,
   
   # bttnCol <- tags$head(tags$style(HTML(
   #   '.btn {transition-duration:0.4s}
@@ -93,10 +95,25 @@ body <- dashboardBody(
     other_ad,
     kappa_akappa,
     kappa_free,
+    kappa_oest,
     other_infoAgree,
-    icc,
-    omega,
-    krippendorf,
-    other_occc
-  )               
+    other_icc,
+    other_omega,
+    other_kripp,
+    other_occc,
+    refs
+  )
+  
+  # div(
+  #   class = "footer",
+  #   h4(tagList("CC BY-NC", HTML('&copy'))),
+  #   style = '
+  #   position: fixed;
+  #   text-align: right;
+  #   bottom: 0;
+  #   left: 0;
+  #   right: 0;
+  #   '
+  #   )
+  
 )

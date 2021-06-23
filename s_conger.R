@@ -10,7 +10,7 @@ kappa_conger <- tabItem(tabName = 'kappa_conger',
                         box(
                           id = 'congerDocum',
                           width = NULL,
-                          style = 'text-align:center; padding: 30px;',
+                          style = measure_title_style,
                           h3("Conger's Kappa")
                         ),
                         hidden(
@@ -82,22 +82,21 @@ kappa_conger <- tabItem(tabName = 'kappa_conger',
                         style = 'padding: 0px;',
                         uiOutput('ui_conger')
                       ),
-                      column(
-                        width = 5,
-                        fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                                 column(
-                                   width = 12,
-                                   style = 'text-align: center;',
-                                   shinyBS::popify(valueBoxOutput(outputId = 'conger', width = NULL), 
-                                                   title = 'What means what',
-                                                   content = paste0('<li>', names(conger_output_description),
-                                                                    ' = ',
-                                                                    as.character(conger_output_description), '</li>',
-                                                                    br()),
-                                                   placement = 'left'
+                      column(width = 5,
+                             shinyWidgets::dropMenu(
+                               div(id = 'congerDrop',
+                                   fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                                            column(
+                                              width = 12,
+                                              valueBoxOutput(outputId = 'conger', width = NULL)
+                                            )
                                    )
-                                   ))
-                        
+                               ),
+                               HTML(kableExtra::kable(t(conger_output_description)) %>% 
+                                      kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+                               trigger = 'mouseenter',
+                               theme = 'translucent',
+                               placement = 'left-start')
                       )
                     )
 )
@@ -132,7 +131,7 @@ congerOut <- function(input, output, data) {
         valueBox(
           subtitle = p(HTML(
             kableExtra::kable(d_conger, format = 'html') %>% 
-              kableExtra::kable_styling('basic')
+              kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')
           ),
           div(
             if(!is.null(msg)) {

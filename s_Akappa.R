@@ -71,19 +71,20 @@ kappa_akappa <- tabItem(
     ),
     
     column(width = 5,
-           fluidRow(class = 'style_valuebox_OUTPUT_cyan',
-                    column(
-                      width = 12,
-                      shinyBS::popify(valueBoxOutput(outputId = 'akappa', width = NULL), 
-                                      title = 'What means what',
-                                      content = paste0('<li>', names(akappa_output_description),
-                                                       ' = ',
-                                                       as.character(akappa_output_description), '</li>',
-                                                       br()),
-                                      placement = 'left'
-                      )
-                    )
-           )
+           shinyWidgets::dropMenu(
+             div(id = 'akappaDrop',
+                 fluidRow(class = 'style_valuebox_OUTPUT_cyan',
+                          column(
+                            width = 12,
+                            valueBoxOutput(outputId = 'akappa', width = NULL)
+                          )
+                 )
+             ),
+             HTML(kableExtra::kable(t(akappa_output_description)) %>% 
+                    kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
+             trigger = 'mouseenter',
+             theme = 'translucent',
+             placement = 'left-start')
     )
   )
 )
@@ -103,10 +104,12 @@ akappaOut <- function(input, output, data) {
     vals_akappa <- list('vals' = warning_handler(list('A-kappa' = aKappa(data))),
                         'warn' = msg)
     
-    ci <- warning_handler(makeCi(data, bfun_akappa, n = 500))
-
-    vals_akappa$vals$lb <- ci[1]
-    vals_akappa$vals$ub <- ci[2]
+    if(!is.nan(vals_akappa$vals$`A-kappa`)) {
+      ci <- warning_handler(makeCi(data, bfun_akappa, n = 500))
+      
+      vals_akappa$vals$lb <- ci[1]
+      vals_akappa$vals$ub <- ci[2]
+    }
     
     l_akappa <<- lapply(vals_akappa$vals, as.data.frame)
     
@@ -117,7 +120,7 @@ akappaOut <- function(input, output, data) {
       valueBox(
         subtitle = p(HTML(
           kableExtra::kable(d_akappa, format = 'html') %>% 
-            kableExtra::kable_styling('basic'),
+            kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri'),
           
         ),
         div(

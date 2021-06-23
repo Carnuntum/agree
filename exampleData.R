@@ -7,7 +7,7 @@ xmp_odds <- matrix(data = c(c(19,10),
 
 
 xmp_pa <- matrix(data = c(c(2,2,3,3,4,6,8),
-                                   c(2,3,4,3,4,6,8)), ncol = 2,
+                          c(2,3,4,3,4,6,8)), ncol = 2,
                           dimnames = list(c(seq(1, 7)),
                                           c('rater1','rater2')))
 
@@ -70,7 +70,49 @@ xmp_ccc <- data.frame('m1' = as.numeric(rnorm(n = 100, mean = 0, sd = 1)),
 #   xmp_l[[paste0(i)]] <- l[[i]]
 # }
 
-
 xmp_rwg <- data.frame('group' = c(1,1,1))
 xmp_rwg <- cbind(xmp_rwg, t(xmp_poly2)[,1:5])
 colnames(xmp_rwg) <- c('group', paste0('item', seq(1, (ncol(xmp_rwg) - 1))))
+
+xmp_test_for_others <- t(xmp_rwg)[2:6,]
+
+randomHists <- function(input, output) {
+  
+  tryCatch({
+    cols <- sample(4:7, 1, replace = F)
+    rows <- sample(200, 1)
+    min <- 1
+    max <- sample(2:4, 1)
+    #begin <- suppressWarnings(matrix(round(runif(rows*cols, min , max)), ncol = cols, nrow = rows))
+    
+    begin <- matrix(sample(5, 1), rows, cols)
+    begin <- round(jitter(begin, sample(12:15, 1)))
+    
+    write.csv(begin, 'example_data/test_cases/randHistDat.csv', row.names = F)
+    
+    randHists <- multHist(begin)
+    
+    output$rainBow <- renderPlot({randHists[1]}, alt = 'Ups...some error happened!')
+    output$gridSplit <- renderPlot({randHists[2]}, alt = 'Ups...some error happened!')
+    
+  }, error = function(e) {
+    print(e)
+    p <- histPlotError()
+    output$rainBow <- renderPlot(
+      p[[1]]
+    )
+    output$gridSplit <- renderPlot(
+      p[[2]]
+    )
+  }, warning = function(w) {
+    print(w)
+    p <- histPlotError()
+    output$rainBow <- renderPlot(
+      p[[1]]
+    )
+    output$gridSplit <- renderPlot(
+      p[[2]]
+    )
+  })
+  
+}
