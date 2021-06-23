@@ -1,6 +1,0 @@
-s_ = server source files containing server logic (input, output, observers) AND
-     tabItem code etc. (for better overview)
-
-### t_ = tab source files containing tabItem stuff ### <- depricated (tab and server code now in same file)
-
-u_ = ui source files containing ui stuff
