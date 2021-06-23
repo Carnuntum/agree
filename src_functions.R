@@ -28,8 +28,8 @@ create_tabset <- function(output,
         style = 'float: left;'
       ),
       width = NULL,
-      tableOutput(tableId),
-      style = 'overflow-x: scroll; overflow-y: scroll; max-height: 600px; scrollbar-color: red;'
+      DT::dataTableOutput(tableId),
+      style = 'overflow-x: scroll; max-height: 600px;'
     )
   )
   
@@ -41,20 +41,8 @@ create_tabset <- function(output,
 }
 
 make_xmp_table <- function(output, out_id, data) {
-  output[[out_id]] <- function() {
-    tryCatch({
-      kableExtra::kable(data, format = 'html') %>%
-        kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')
-    }, error = function(e) {
-      print('make_xmp_table - error')
-      print(e)
-      return('invalid data, please look at your data carefully')
-    }, warning = function(w) {
-      print('make_xmp_table - warning')
-      print(w)
-      return('invalid data, please look at your data carefully')
-    })
-  }
+  output[[out_id]] <- DT::renderDataTable({DT::datatable(data, filter = 'none', selection = 'none')})
+  
 }
 
 #update a given tabsetpanel with title and box title

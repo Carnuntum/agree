@@ -32,6 +32,8 @@ library(irrCAC) #for several funs
 #import::from(rel, 'spi')
 #import::from(VGAM, 'kendall.tau')
 
+options(shiny.maxRequestSize = 30*1024^2)
+
 source('exampleData.R')
 source('style.R')
 source('text.R')

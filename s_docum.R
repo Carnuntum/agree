@@ -3,57 +3,17 @@
 documentation <- tabItem(tabName = 'docum',
                          fluidRow(
                            column(
-                             width = 12,
-                             offset = 0,
+                             width = 10,
+                             offset = 1,
                              style = 'text-align: center;',
                              titlePanel(
                                h2("Wizagree - let the shiny magic do the work!",
                                   style = 'text-align: center; font-family: calibri;')
                                ),
-                             fluidRow(class = 'homeDocumBtns',
-                               fluidRow(div(id = 'mainAppDescription',
-                                            fluidRow(class = 'documRow',
-                                                    column(width = 10,
-                                                           offset = 1,
-                                                           div(
-                                                             box(
-                                                               title = docum_text,
-                                                               #imageOutput('timelineImage'),
-                                                               width = NULL)
-                                                           ))
-                                                    )
-                                            )
-                                        ),
-                               # fluidRow(actionButton(inputId = 'imp_text2',
-                               #              label = 'Timeline of Agreement Measures',
-                               #              style = 'font-size: 35px; margin: 10px;'),
-                               #          hidden(
-                               #            div(id = 'test2',
-                               #                fluidRow(class = 'documRow',
-                               #                         column(width = 10,
-                               #                                offset = 1,
-                               #                                box(
-                               #                                  width = NULL,
-                               #                                  height = 'auto')
-                               #                         )
-                               #                )
-                               #            )
-                               #          )),
-                               # fluidRow(actionButton(inputId = 'imp_text3',
-                               #              label = 'now read me!',
-                               #              style = 'font-size: 35px; margin: 10px;'),
-                               #          hidden(
-                               #            div(id = 'test3',
-                               #                fluidRow(class = 'documRow',
-                               #                         column(width = 10,
-                               #                                offset = 1,
-                               #                                box(title = docum_text,
-                               #                                    width = NULL)
-                               #                         )
-                               #                )
-                               #            )
-                               #          ))
-                             )
+                             box(
+                               title = docum_text,
+                               #imageOutput('timelineImage'),
+                               width = NULL)
                            )
                          )
                          
@@ -92,7 +52,7 @@ makeDecBox <- function(groupID, charNames, charVals, orientation = 'horizontal',
                kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
         trigger = 'mouseenter',
         theme = 'translucent',
-        placement = 'left-start',
+        placement = 'bottom',
         maxWidth = '70em'
       )
     } else {

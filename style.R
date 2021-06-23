@@ -10,6 +10,8 @@ dropMenuStyle <- tags$style(HTML(
           
   .tippy-tooltip.translucent-theme[data-placement^="left-start"] > .tippy-arrow {border-left-color: #3c8dbc;}
   
+  .tippy-tooltip.translucent-theme[data-placement^="bottom"] > .tippy-arrow {border-bottom-color: #3c8dbc;}
+  
   .tippy-tooltip .table {background-color: #3c8dbc !important; color: white;}
   
   .tippy-tooltip tr:hover {background-color: #51BFFF !important;}
@@ -29,35 +31,65 @@ boxCol <- tags$style(HTML(
 ))
 
 tabCol <- tags$style(HTML(
-  ".tabStyle .tab-content {
-          background-color: white;
-          color: black
-          }
-          
-          .tabStyle .nav > li > a {
-          background-color: white;
-          color: black;
-          }
-          
-          .tabStyle .nav > li > a {
-          background-color: white;
-          color: black;
-          }
-          
-          .tabStyle .nav > li[class=active] > a {
-          background-color: dimwhite;
-          color: black;
-          }
-          
-          .tabStyle .nav > li > a:hover {
-          background-color: dimwhite;
-          color: black;
-          
-          .tabSTyle .nav > li[class=active] > a:hover {
-          background-color: dimwhite;
-          color: black;
-          }
-          }"
+    ".datatables.html-widget.html-widget-output.shiny-bound-output {
+      background-color: white;
+      color: black;
+    }
+    
+    table.dataTable.display tbody tr.odd {
+      background-color: white;
+    }
+    
+    table.dataTable.display tbody tr.even {
+      background-color: white;
+    }
+    
+    table.dataTable.display tbody tr:hover {
+      background-color: lightgrey;
+    }
+    
+    
+    .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate, .dataTables_wrapper .select {
+      color: black;
+      border: none;
+    }
+    
+    
+    .dataTables_wrapper select, .dataTables_wrapper input {
+      background-color: lightgrey !important;
+      border: none;
+      color: black !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+      color: black !important;
+      border: none;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      color: black !important;
+      border: none;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      color: white;
+      background: dimgrey;
+      border: none;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+      color: black;
+      background: lightgrey;
+      border: none;
+    }
+    
+    table.dataTable thead th, table.dataTable thead td {
+      border: none;
+    }
+    
+    table.dataTable.no-footer {
+      border-bottom-color: #404040;
+    }"
 ))
 
 histPlotCol <<- 'white'
@@ -80,6 +112,8 @@ mainColLight <- function(input, output) {
           
           .tippy-tooltip.translucent-theme[data-placement^="left-start"] > .tippy-arrow {border-left-color: #3c8dbc;}
           
+          .tippy-tooltip.translucent-theme[data-placement^="bottom"] > .tippy-arrow {border-bottom-color: #3c8dbc;}
+          
           .tippy-tooltip .table {background-color: #3c8dbc !important; color: white;}
           
           .tippy-tooltip tr:hover {background-color: #51BFFF !important;}
@@ -99,35 +133,71 @@ mainColLight <- function(input, output) {
         )),
         
         tabCol <- tags$style(HTML(
-          ".tabStyle .tab-content {
-          background-color: white;
-          color: black
-          }
+          ".datatables.html-widget.html-widget-output.shiny-bound-output {
+              background-color: white;
+              color: black;
+            }
+            
+            table.dataTable.display tbody tr.odd {
+              background-color: white;
+            }
+            
+            table.dataTable.display tbody tr.even {
+              background-color: white;
+            }
+            
+            table.dataTable.display tbody tr:hover {
+              background-color: lightgrey;
+            }
+            
+            
+            .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate, .dataTables_wrapper .select {
+              color: black;
+              border: none;
+            }
+            
+            
+            .dataTables_wrapper select, .dataTables_wrapper input {
+              background-color: #3B3B3B24 !important;
+              border: none;
+              color: black !important;
+            }
           
-          .tabStyle .nav > li > a {
-          background-color: white;
-          color: black;
-          }
-          
-          .tabStyle .nav > li > a {
-          background-color: white;
-          color: black;
-          }
-          
-          .tabStyle .nav > li[class=active] > a {
-          background-color: dimwhite;
-          color: black;
-          }
-          
-          .tabStyle .nav > li > a:hover {
-          background-color: dimwhite;
-          color: black;
-          
-          .tabSTyle .nav > li[class=active] > a:hover {
-          background-color: dimwhite;
-          color: black;
-          }
-          }"
+            .dataTables_wrapper select:hover,  {
+              background-color: #3B3B3B24 !important;
+              border: none;
+              color: black !important;
+            }
+            
+            .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+              color: black !important;
+              border: none;
+            }
+            
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+              color: black !important;
+              border: none;
+            }
+            
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+              color: white;
+              background: dimgrey;
+              border: none;
+            }
+            
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+              color: black;
+              background: lightgrey;
+              border: none;
+            }
+            
+            table.dataTable thead th, table.dataTable thead td {
+              border: none;
+            }
+            
+            table.dataTable.no-footer {
+              border-bottom-color: #404040;
+            }"
         ))
       )
     
@@ -144,6 +214,8 @@ mainColDark <- function(input, output) {
           '.tippy-tooltip.translucent-theme {background-color: #3c8dbc !important;}
           
           .tippy-tooltip.translucent-theme[data-placement^="left-start"] > .tippy-arrow {border-left-color: #3c8dbc;}
+          
+          .tippy-tooltip.translucent-theme[data-placement^="bottom"] > .tippy-arrow {border-bottom-color: #3c8dbc;}
           
           .tippy-tooltip .table {background-color: #3c8dbc !important; color: white;}
           
@@ -182,40 +254,65 @@ mainColDark <- function(input, output) {
         
         tabCol <- tags$style(
           HTML(
-            ".tabStyle .tab-content {
-            background-color: #404040;
-            color: black;
-            border: none;}
-    
-            .tabStyle .nav {
-              background-color: #404040;
-              color: black;
-              border: none;
-            }
-
-            .tabStyle .nav > li > a {
-              background-color: #404040;
-              color: white;
-              border: none;
-            }
-            
-            .tabStyle .nav > li[class=active] > a {
-              background-color: dimgrey;
-              color:white;
-              border: none;
-            }
-            
-            .tabStyle .nav > li > a:hover {
-              background-color: dimgrey;
-              color: white;
-              border: none;
-            }
-            
-            .tabStyle .nav > li[class=active] > a:hover {
-              background-color: dimgrey;
-              color: white;
-              border: none;
-            }"
+            ".datatables.html-widget.html-widget-output.shiny-bound-output {
+                background-color: #404040;
+                color: white;
+              }
+              
+              table.dataTable.display tbody tr.odd {
+                background-color: #404040;
+              }
+              
+              table.dataTable.display tbody tr.even {
+                background-color: #404040;
+              }
+              
+              table.dataTable.display tbody tr:hover {
+                background-color: dimgrey;
+              }
+              
+              
+              .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate, .dataTables_wrapper .select {
+                color: white;
+                border: none;
+              }
+              
+              
+              .dataTables_wrapper select, .dataTables_wrapper input {
+                background-color: dimgrey !important;
+                border: none;
+                color: white !important;
+              }
+              
+              .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+                color: white !important;
+                border: none;
+              }
+              
+              .dataTables_wrapper .dataTables_paginate .paginate_button {
+                color: white !important;
+                border: none;
+              }
+              
+              .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                color: white;
+                background: dimgrey;
+                border: none;
+              }
+              
+              .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+                color: black;
+                background: white;
+                border: none;
+              }
+              
+              table.dataTable thead th, table.dataTable thead td {
+                border: none;
+              }
+              
+              table.dataTable.no-footer {
+                border-bottom-color: #404040;
+              }"
           )
         ))
     

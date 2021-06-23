@@ -84,7 +84,7 @@ other_occc <- tabItem(
                     kableExtra::kable_styling('basic', font_size = 15, html_font = 'calibri')),
              trigger = 'mouseenter',
              theme = 'translucent',
-             placement = 'left-start')
+             placement = 'bottom')
     )
   ),
   fluidRow(
