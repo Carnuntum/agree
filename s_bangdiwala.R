@@ -135,7 +135,7 @@ bangdiwalaOut <- function(input, output, data) {
     bangdi_data <<- table(factor(data[,1], min(data):max(data)), factor(data[,2], min(data):max(data)))
     
     vals_bangdiwala <- list('vals' = warning_handler(vcd::agreementplot(bangdi_data,
-                                                                        weights = if(!is.nan(w)) {w} else {c(1,0)},
+                                                                        weights = if(!all(is.nan(w))) {w} else {c(1, 0)},
                                                                         return_grob = T)),
                             'warn' = msg)
     

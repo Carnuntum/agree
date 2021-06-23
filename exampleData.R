@@ -88,8 +88,6 @@ randomHists <- function(input, output) {
     begin <- matrix(sample(5, 1), rows, cols)
     begin <- round(jitter(begin, sample(12:15, 1)))
     
-    write.csv(begin, 'example_data/test_cases/randHistDat.csv', row.names = F)
-    
     randHists <- multHist(begin)
     
     output$rainBow <- renderPlot({randHists[1]}, alt = 'Ups...some error happened!')
